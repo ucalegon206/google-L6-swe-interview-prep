@@ -48,39 +48,23 @@ We need a structure that allows us to:
 2. Pop old elements from the **Front** (when they slide out of the window).
 3. Access the current max at the **Front**.
 
-**Algorithm Walkthrough:**
-Input: nums = [1, 3, -1, -3, 5], k = 3
-Deque stores INDICES: `q`
+**Step-by-Step Graphical Trace:**
+Input: `nums = [1, 3, -1, -3, 5, 3, 6, 7]`, `k = 3`
 
-i=0, num=1:
-- Empty q. Push 1.
-- q = [0] (val: 1)
+| Step | Window View               | Current | Action (Big Fish Logic)           | Deque (Indices) | Deque (Values) | Result      |
+|------|---------------------------|---------|-----------------------------------|-----------------|----------------|-------------|
+| 0    | `[1] 3 -1 -3 ...`         | `1`     | Push 1                            | `[0]`           | `[1]`          | -           |
+| 1    | `[1 3] -1 -3 ...`         | `3`     | `3 > 1`! Pop 1. Push 3.           | `[1]`           | `[3]`          | -           |
+| 2    | `[1 3 -1] -3 ...`         | `-1`    | `-1 < 3`. Push -1.                | `[1, 2]`        | `[3, -1]`      | `[3]`       |
+| 3    | `1 [3 -1 -3] 5 ...`       | `-3`    | `-3 < -1`. Push -3.               | `[1, 2, 3]`     | `[3, -1, -3]`  | `[3, 3]`    |
+| 4    | `1 3 [-1 -3 5] 3 ...`     | `5`     | `5 > -3`, `5 > -1`, `5 > 3`. Pop all. | `[4]`           | `[5]`          | `[3, 3, 5]` |
+| 5    | `1 3 -1 [-3 5 3] 6 ...`   | `3`     | `3 < 5`. Push 3.                  | `[4, 5]`        | `[5, 3]`       | `..., 5]`   |
+| 6    | `... -3 [5 3 6] 7`        | `6`     | `6 > 3`, `6 > 5`. Pop all.        | `[6]`           | `[6]`          | `..., 6]`   |
+| 7    | `... 5 3 [6 7]`           | `7`     | `7 > 6`. Pop 6.                   | `[7]`           | `[7]`          | `..., 7]`   |
 
-i=1, num=3:
-- 3 > 1. 3 eats 1. Pop 0.
-- Push 1.
-- q = [1] (val: 3)
-
-i=2, num=-1:
-- -1 < 3. -1 survives.
-- Push 2.
-- q = [1, 2] (vals: 3, -1)
-- Window size reached (3). Max is nums[q[0]] = 3. Result: [3]
-
-i=3, num=-3:
-- -3 < -1. -3 survives.
-- Push 3.
-- q = [1, 2, 3] (vals: 3, -1, -3)
-- Check age: Index 1 is still valid (3-3+1 = 1).
-- Max is nums[q[0]] = 3. Result: [3, 3]
-
-i=4, num=5:
-- 5 > -3. Pop 3.
-- 5 > -1. Pop 2.
-- 5 > 3. Pop 1.
-- Push 4.
-- q = [4] (val: 5)
-- Max is nums[q[0]] = 5. Result: [3, 3, 5]
+**Key Concept:**
+Notice how the Deque (Values) is ALWAYS sorted: `[3, -1, -3]`, `[5, 3]`.
+This is why the Front is always the Maximum.
 
 **Key "Invariant":**
 The deque is always sorted in **Strictly Decreasing Order** of values.
