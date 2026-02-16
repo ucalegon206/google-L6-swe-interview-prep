@@ -32,37 +32,62 @@ Constraints:
 - -10^4 <= nums[i] <= 10^4
 - 1 <= k <= nums.length
 
-APPROACH: Monotonic Queue (Deque)
----------------------------------
-A naive approach would be to iterate through all windows and find the max in each, taking O(N*k) time.
-Given N=10^5, this is too slow (TLE). We need O(N).
+APPROACH: Monotonic Queue (Decreasing Deque)
+--------------------------------------------
+**The "Big Fish" Analogy:**
+Imagine the sliding window is a pond.
+- When a new fish (number) comes in, it eats all the smaller fish that were there before it.
+  Why? Because the new fish is Big AND Younger (will stay in the window longer).
+  The smaller fish that came before are now useless; they can never be the maximum again.
+- If a fish comes in that is smaller than the current biggest fish, it survives (for now).
+  Why? Because the big fish might leave the window (get too old), and this small fish might eventually become the biggest remaining fish.
 
-We use a **Monotonic Queue** (implemented via a Deque - Double Ended Queue).
-A Monotonic Queue maintains elements in a specific order (either increasing or decreasing).
-Here, we want a **Decreasing Monotonic Queue**.
+**Data Structure: Deque (Double-Ended Queue)**
+We need a structure that allows us to:
+1. Pop small elements from the **Back** (when a big fish comes in).
+2. Pop old elements from the **Front** (when they slide out of the window).
+3. Access the current max at the **Front**.
 
-Invariant:
-The queue will store **indices** (not values) of potential candidates for the maximum.
-The elements in the queue will always be in **decreasing order of their values**.
-Why? If `nums[i] <= nums[j]` and `i < j`, then `nums[i]` can NEVER be the maximum if `nums[j]` is in the window.
-Basically, if a smaller number comes *before* a larger number, we can discard the smaller number because the larger number is "better" (larger) and "younger" (stays in window longer).
+**Algorithm Walkthrough:**
+Input: nums = [1, 3, -1, -3, 5], k = 3
+Deque stores INDICES: `q`
 
-Algorithm:
-1. Iterate through the array with index `i`.
-2. **Remove Outdated indices**: Check if the front of the deque is out of the current window (`i - k + 1 > deque[0]`). If so, popleft.
-3. **Maintain Monotonicity**: Before pushing `i`, remove all indices from the BACK of the deque whose values are smaller than `nums[i]`.
-   (They are useless because `nums[i]` is larger and newer).
-4. **Push**: Add current index `i` to the back.
-5. **Record Result**: The front of the deque is the maximum for the current window. Add to results if the window is fully formed (`i >= k - 1`).
+i=0, num=1:
+- Empty q. Push 1.
+- q = [0] (val: 1)
 
-Time Complexity: O(N). Each element is added and removed at most once.
+i=1, num=3:
+- 3 > 1. 3 eats 1. Pop 0.
+- Push 1.
+- q = [1] (val: 3)
+
+i=2, num=-1:
+- -1 < 3. -1 survives.
+- Push 2.
+- q = [1, 2] (vals: 3, -1)
+- Window size reached (3). Max is nums[q[0]] = 3. Result: [3]
+
+i=3, num=-3:
+- -3 < -1. -3 survives.
+- Push 3.
+- q = [1, 2, 3] (vals: 3, -1, -3)
+- Check age: Index 1 is still valid (3-3+1 = 1).
+- Max is nums[q[0]] = 3. Result: [3, 3]
+
+i=4, num=5:
+- 5 > -3. Pop 3.
+- 5 > -1. Pop 2.
+- 5 > 3. Pop 1.
+- Push 4.
+- q = [4] (val: 5)
+- Max is nums[q[0]] = 5. Result: [3, 3, 5]
+
+**Key "Invariant":**
+The deque is always sorted in **Strictly Decreasing Order** of values.
+The front always holds the index of the largest element in the current window.
+
+Time Complexity: O(N). Each element is added once and removed at most once.
 Space Complexity: O(k). The deque stores at most k elements.
-
-Industry Nomenclature:
-- **Deque (Double Ended Queue)**: A data structure that allows insertion and removal at both ends.
-- **Monotonic Queue**: A queue where elements are always sorted.
-- **Invariant**: A property that remains true throughout the execution of the algorithm.
-- **Amortized Analysis**: Although the inner while loop runs multiple times, each element is processed a constant number of times on average.
 """
 
 from typing import List
