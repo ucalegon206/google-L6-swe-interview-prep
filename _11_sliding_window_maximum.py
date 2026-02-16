@@ -51,16 +51,16 @@ We need a structure that allows us to:
 **Step-by-Step Graphical Trace:**
 Input: `nums = [1, 3, -1, -3, 5, 3, 6, 7]`, `k = 3`
 
-| Step | Window View               | Current | Action (Big Fish Logic)           | Deque (Indices) | Deque (Values) | Result      |
-|------|---------------------------|---------|-----------------------------------|-----------------|----------------|-------------|
-| 0    | `[1] 3 -1 -3 ...`         | `1`     | Push 1                            | `[0]`           | `[1]`          | -           |
-| 1    | `[1 3] -1 -3 ...`         | `3`     | `3 > 1`! Pop 1. Push 3.           | `[1]`           | `[3]`          | -           |
-| 2    | `[1 3 -1] -3 ...`         | `-1`    | `-1 < 3`. Push -1.                | `[1, 2]`        | `[3, -1]`      | `[3]`       |
-| 3    | `1 [3 -1 -3] 5 ...`       | `-3`    | `-3 < -1`. Push -3.               | `[1, 2, 3]`     | `[3, -1, -3]`  | `[3, 3]`    |
+| Step | Window View               | Current | Action (Big Fish Logic)               | Deque (Indices) | Deque (Values) | Result      |
+|------|---------------------------|---------|---------------------------------------|-----------------|----------------|-------------|
+| 0    | `[1] 3 -1 -3 ...`         | `1`     | Push 1                                | `[0]`           | `[1]`          | -           |
+| 1    | `[1 3] -1 -3 ...`         | `3`     | `3 > 1`! Pop 1. Push 3.               | `[1]`           | `[3]`          | -           |
+| 2    | `[1 3 -1] -3 ...`         | `-1`    | `-1 < 3`. Push -1.                    | `[1, 2]`        | `[3, -1]`      | `[3]`       |
+| 3    | `1 [3 -1 -3] 5 ...`       | `-3`    | `-3 < -1`. Push -3.                   | `[1, 2, 3]`     | `[3, -1, -3]`  | `[3, 3]`    |
 | 4    | `1 3 [-1 -3 5] 3 ...`     | `5`     | `5 > -3`, `5 > -1`, `5 > 3`. Pop all. | `[4]`           | `[5]`          | `[3, 3, 5]` |
-| 5    | `1 3 -1 [-3 5 3] 6 ...`   | `3`     | `3 < 5`. Push 3.                  | `[4, 5]`        | `[5, 3]`       | `..., 5]`   |
-| 6    | `... -3 [5 3 6] 7`        | `6`     | `6 > 3`, `6 > 5`. Pop all.        | `[6]`           | `[6]`          | `..., 6]`   |
-| 7    | `... 5 3 [6 7]`           | `7`     | `7 > 6`. Pop 6.                   | `[7]`           | `[7]`          | `..., 7]`   |
+| 5    | `1 3 -1 [-3 5 3] 6 ...`   | `3`     | `3 < 5`. Push 3.                      | `[4, 5]`        | `[5, 3]`       | `..., 5]`   |
+| 6    | `... -3 [5 3 6] 7`        | `6`     | `6 > 3`, `6 > 5`. Pop all.            | `[6]`           | `[6]`          | `..., 6]`   |
+| 7    | `... 5 3 [6 7]`           | `7`     | `7 > 6`. Pop 6.                       | `[7]`           | `[7]`          | `..., 7]`   |
 
 **Key Concept:**
 Notice how the Deque (Values) is ALWAYS sorted: `[3, -1, -3]`, `[5, 3]`.
@@ -88,9 +88,9 @@ class Solution:
         result = []
         
         for i in range(len(nums)):
-            # Step 1: Remove indices that are out of the current window from the LEFT
+            # Step 1: Remove the index that is out of the current window from the LEFT
             # The window range is [i - k + 1, i]
-            # If the index at the front (q[0]) is < i - k + 1, it's too old.
+            # Since the window moves 1 step at a time, at most ONE index (the oldest/front) will be out of bounds.
             if q and q[0] < i - k + 1:
                 q.popleft()
             
