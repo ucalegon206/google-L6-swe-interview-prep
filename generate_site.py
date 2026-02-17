@@ -109,22 +109,33 @@ def parse_system_design():
     with open(SYSTEM_DESIGN_FILE, 'r', encoding='utf-8') as f:
         return f.read()
 
-def generate_html(structure, solutions, system_design_content):
+def generate_html(structure, solutions, system_design_content, study_guide_content):
     """Generate the single-page HTML."""
     
     sidebar_html = """
     <div class="category">
-        <h3>System Design</h3>
+        <h3>Start Here</h3>
         <div class="problem-list" style="display:block">
-            <a href="#system-design" class="nav-link" onclick="activateLink(this)">The Anti-Freeze Protocol</a>
+            <a href="#playbook-overview" class="nav-link active" onclick="activateLink(this)">Playbook Overview</a>
+            <a href="#system-design" class="nav-link" onclick="activateLink(this)">System Design Protocol</a>
         </div>
     </div>
     """
     
     content_html = f"""
+    <div id="playbook-overview" class="pattern-section">
+        <div class="problem-block" style="padding: 40px;">
+            <div id="playbook-content" class="markdown-body">
+                {study_guide_content}
+            </div>
+        </div>
+    </div>
+
     <div id="system-design" class="pattern-section">
-        <div class="problem-block" style="padding: 30px;">
-            <div class="explanation-text"><pre>{system_design_content}</pre></div>
+        <div class="problem-block" style="padding: 40px;">
+            <div id="sys-design-content" class="markdown-body">
+                {system_design_content}
+            </div>
         </div>
     </div>
     """
@@ -437,6 +448,53 @@ def generate_html(structure, solutions, system_design_content):
             display: block;
         }}
         
+        /* Prism overrides */
+        code[class*="language-"], pre[class*="language-"] {{
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            font-size: 0.9rem;
+        }}
+        
+        /* Markdown Styles */
+        .markdown-body {{
+            line-height: 1.6;
+            color: #c9d1d9;
+        }}
+        
+        .markdown-body h1, .markdown-body h2 {{
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }}
+        
+        .markdown-body h1 {{ font-size: 1.8rem; color: #58a6ff; }}
+        .markdown-body h2 {{ font-size: 1.4rem; color: #a371f7; }}
+        
+        .markdown-body ul {{ padding-left: 20px; }}
+        .markdown-body li {{ margin: 5px 0; }}
+        
+        .markdown-body blockquote {{
+            border-left: 4px solid #30363d;
+            padding-left: 15px;
+            color: #8b949e;
+            margin: 20px 0;
+        }}
+        
+        .markdown-body table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }}
+        
+        .markdown-body th, .markdown-body td {{
+            border: 1px solid #30363d;
+            padding: 10px;
+        }}
+        
+        .markdown-body th {{
+            background: #161b22;
+        }}
+        
     </style>
 </head>
 <body>
@@ -460,7 +518,18 @@ def generate_html(structure, solutions, system_design_content):
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
+        // Render Markdown Sections on Load
+        const mdIds = ['sys-design-content', 'playbook-content'];
+        mdIds.forEach(id => {{
+            let el = document.getElementById(id);
+            if (el) {{
+                let raw = el.innerHTML;
+                el.innerHTML = marked.parse(raw);
+            }}
+        }});
+        
         function openTab(evt, tabId) {{
             let parent = evt.target.closest('.problem-block');
             let contents = parent.querySelectorAll('.tab-content');
@@ -498,7 +567,6 @@ def generate_html(structure, solutions, system_design_content):
                 el.style.display = 'none';
             }}
         }}
-    </script>
 </body>
 </html>
     """
@@ -511,4 +579,9 @@ if __name__ == "__main__":
     sols = parse_solutions()
     struct = parse_study_guide()
     sys_design = parse_system_design()
-    generate_html(struct, sols, sys_design)
+    
+    # Read raw study guide for overview
+    with open(STUDY_GUIDE_FILE, 'r') as f:
+        study_guide_content = f.read()
+        
+    generate_html(struct, sols, sys_design, study_guide_content)
