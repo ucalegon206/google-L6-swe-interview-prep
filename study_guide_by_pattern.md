@@ -2,74 +2,88 @@
 
 *Goal: Recognize the "Shape" of the problem in the first 3 minutes.*
 
+## 🧠 Global Mnemonic: "S.H.A.R.P."
+If you panic, remember to stay **S.H.A.R.P.** to pick the right tool:
+*   **S** - **S**liding Window (Two Pointers)
+*   **H** - **H**eaps (Top K)
+*   **A** - **A**rrays Sorted (Binary Search)
+*   **R** - **R**outes & Recursion (Graphs/DP)
+*   **P** - **P**lanning (System Design)
+
+---
+
 ## 1. The "Sliding Window" & "Two Pointers"
 **Trigger:** "Longest/Shortest substring", "Subarray with sum K", "Continuous range".
-**Visual Anchor:** A window pane sliding over a long tape.
-**The L6 Twist:** The window size is dynamic, or the condition to shrink the window is complex (e.g., "contains all chars from T").
+**Analogy:** 🪗 **The Accordion**.
+*   You expand the bellows (window) to get the notes you want (valid state).
+*   You shrink it to play the next part (minimize/optimize).
+**Mnemonic:** "Expand to Valid, Shrink to Win."
 
-| Problem | Core Insight | Complexity |
+| Problem | Complexity | L6 Twist |
 |:---|:---|:---|
-| **Trapping Rain Water** | **Two Pointers**: Walls limit water. Move the *shorter* wall inward to find a taller support. | O(N) / O(1) |
-| **Min Window Substring** | **Expand-Contract**: Expand `right` until valid, then shrink `left` to minimize. | O(N) / O(1) |
-| **Sliding Window Max** | **Monotonic Deque**: The "Big Fish" eats smaller/older fish. Front is always max. | O(N) / O(K) |
+| **Trapping Rain Water** | O(N) | Walls limit water. Shrink from the *short* side. |
+| **Min Window Substring** | O(N) | Dynamic window size. Complex "validity" check (Hash Map). |
+| **Sliding Window Max** | O(N) | **"Big Fish Eat Small Fish"** (Monotonic Queue). |
 
 ---
 
 ## 2. The "Binary Search" (on Answers)
-**Trigger:** "Sorted array", "Find occurrences", "Minimize the Maximum", "K-th Smallest".
-**Visual Anchor:** Cutting the search space in half repeatedly.
-**The L6 Twist:** You aren't searching an array; you are searching a *solution space* (e.g., "Is it possible to do X in T time?").
+**Trigger:** "Sorted array", "Minimize the Maximum", "K-th Smallest".
+**Analogy:** 📖 **The Phonebook**.
+*   You don't read every name. You open the middle, check the letter, and throw away half the book. Repeatedly.
+**Mnemonic:** "Cut the Fat."
 
-| Problem | Core Insight | Complexity |
+| Problem | Complexity | L6 Twist |
 |:---|:---|:---|
-| **Median 2 Sorted Arrays** | **Partitioning**: Find a cut in both arrays such that `left_part <= right_part`. | O(log(min(M,N))) |
-| **Count Smaller After Self** | **Merge Sort**: During merge, if you pick from right, valid jumps from left increment count. | O(N log N) |
+| **Median 2 Sorted Arrays** | O(log min(M,N)) | Partitioning two books to find the middle page. |
+| **Count Smaller After Self** | O(N log N) | Merge Sort is just Binary Search with memory. |
 
 ---
 
 ## 3. The "Heap" (Priority Queue)
-**Trigger:** "Top K elements", "Merge K items", "Median of stream", "Schedule events".
-**Visual Anchor:** A funnel that always lets the smallest/largest item out first.
-**The L6 Twist:** The heap contains *objects* or *iterators*, not just integers (e.g., "Merge K sorted log files").
+**Trigger:** "Top K elements", "Merge K items", "Median of stream".
+**Analogy:** 🏰 **King of the Hill**.
+*   Only the person at the very top (Max/Min) matters. Everyone else is just waiting in the pile.
+**Mnemonic:** "VIP Only."
 
-| Problem | Core Insight | Complexity |
+| Problem | Complexity | L6 Twist |
 |:---|:---|:---|
-| **Merge K Sorted Lists** | **Min-Heap**: Keep the head of each list in heap. Pop min, push next from same list. | O(N log K) |
-| **The Skyline Problem** | **Max-Heap + Line Sweep**: Process edges. Heap tracks "active buildings". Height changes = Contour. | O(N log N) |
+| **Merge K Sorted Lists** | O(N log K) | The "King" leaves, the next noble from his land takes his place. |
+| **The Skyline Problem** | O(N log N) | **"Tetris with Gravity"**. Max height defines the roof. |
 
 ---
 
-## 4. Graph Search (BFS / DFS)
-**Trigger:** "Shortest transformation", "Order of tasks", "Connected components", "Valid states".
-**Visual Anchor:** Ripples in a pond (BFS) vs. Maze runner (DFS).
-**The L6 Twist:** The graph is implicit (word ladder) or involves state compression.
+## 4. Routes & Recursion (Graphs / DP)
+**Trigger:** "Shortest path", "Islands", "Valid parentheses", "Edit Distance".
+**Analogy:** 🦠 **The Virus (BFS)** vs 🔦 **The Maze Runner (DFS)**.
+*   **BFS (Virus):** Spreads to all neighbors equally. Finds the nearest exit (shortest path).
+*   **DFS (Maze Runner):** Runs down one path until hitting a wall, then backtracks.
+**Mnemonic:** "Layers (BFS) vs. Labyrinths (DFS)."
 
-| Problem | Core Insight | Complexity |
+| Problem | Complexity | L6 Twist |
 |:---|:---|:---|
-| **Word Ladder II** | **BFS + DFS**: BFS for shortest distance (layers), DFS to backtrack paths. | O(V + E) |
-| **Alien Dictionary** | **Topological Sort**: A comes before B is a directed edge `A -> B`. Detect cycles. | O(V + E) |
-| **Remove Invalid Parens** | **BFS**: Each removal is an edge. First valid layer = Minimum removals. | O(2^N) |
+| **Word Ladder II** | O(V + E) | BFS for distance, DFS to write the path. |
+| **Alien Dictionary** | O(V + E) | **"Task Scheduler"**. A must finish before B (Topological Sort). |
+| **Remove Invalid Parens** | O(2^N) | BFS to find the "shallowest" valid solution. |
 
 ---
 
-## 5. Design & System (The Bridge)
-**Trigger:** "Design a...", "Implement a class", "High frequency of updates".
-**Visual Anchor:** A blueprint connecting multiple data structures.
-**The L6 Twist:** Connects directly to System Design questions.
+## 5. Planning (System Design Bridges)
+**Trigger:** "Design a...", "Implement a class", "LRU", "Autocomplete".
+**Analogy:** 📚 **The Librarian**.
+*   Knows where every book is instantly (Index/Map) and keeps popular books on the front desk (Cache).
+**Mnemonic:** "Dictionary & Desk."
 
-| Problem | Core Insight | System Design Bridge |
+| Problem | Complexity | System Design Bridge |
 |:---|:---|:---|
-| **LRU Cache** | **Dict + DLL**: O(1) lookup & O(1) move-to-front. | Redis / Memcached eviction policies. |
-| **Search Autocomplete** | **Trie + Hot List**: Store top 3 hot queries *at each node* for O(1) lookup. | Google Search Typeahead / Solr. |
-| **Serialize Binary Tree** | **BFS/DFS Traversal**: Convert structure to string and back. | JSON Serialization / ProtoBufs. |
+| **LRU Cache** | O(1) | **Doubly Linked List + Map**. Essential for CDN/Redis. |
+| **Search Autocomplete** | O(1) Lookup | **Trie + Hot List**. Essential for Typeahead/Search. |
 
 ---
 
 ## ⚡️ Quick Complexity Cheatsheet
-
 - **N = 1,000,0000**: Need O(N) or O(N log N).
-- **N = 10,000**: O(N^2) might pass (rarely).
-- **Find "Shortest/Min" in Graph**: BFS.
-- **Find "Any" Path**: DFS.
-- **"Top K"**: Heap (N log K).
-- **"Sorted"**: Binary Search (log N).
+- **"Shortest"**: BFS.
+- **"All Paths"**: DFS.
+- **"Top K"**: Heap.
+- **"Sorted"**: Binary Search.
