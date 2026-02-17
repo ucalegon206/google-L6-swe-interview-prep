@@ -1,0 +1,3432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L6 Anti-Freeze Playbook</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --sidebar-bg: #161b22;
+            --text-color: #c9d1d9;
+            --accent-color: #58a6ff;
+            --border-color: #30363d;
+            --card-bg: #21262d;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+        
+        .search-box {
+            padding: 15px;
+        }
+        
+        .search-input {
+            width: 90%;
+            padding: 10px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+        }
+        
+        .nav-content {
+            overflow-y: auto;
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .category h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8b949e;
+            cursor: pointer;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .category h3:hover {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .nav-link {
+            display: block;
+            padding: 8px 10px 8px 25px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--card-bg);
+        }
+        
+        .nav-link.active {
+            background-color: #1f6feb22;
+            color: var(--accent-color);
+            border-left-color: var(--accent-color);
+        }
+        
+        .main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+        
+        .content-container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .pattern-section {
+            margin-bottom: 80px;
+            scroll-margin-top: 20px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #58a6ff, #a371f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .mnemonic-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-left: 5px solid #a371f7;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .mnemonic-card p {
+            margin: 5px 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: #a371f7;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .explanation-text pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+            color: #c9d1d9;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .problem-block {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .problem-header {
+            padding: 15px 25px;
+            background-color: #2b313a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .badge {
+            background: #21262d;
+            border: 1px solid #30363d;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: #8b949e;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #161b22;
+            padding: 0 20px;
+            gap: 2px;
+        }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            color: #8b949e;
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+        }
+        
+        .tab-btn:hover {
+            color: var(--text-color);
+        }
+        
+        .tab-btn.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+        
+        .ext-link {
+            margin-left: auto;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            align-self: center;
+            opacity: 0.8;
+            padding-right: 20px;
+        }
+        
+        .ext-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+            background: var(--card-bg);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍧 Anti-Freeze Playbook</h2>
+        </div>
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Search..." onkeyup="filterNav()">
+        </div>
+        <div class="nav-content" id="sidebar-nav">
+            
+    <div class="category">
+        <h3>System Design</h3>
+        <div class="problem-list" style="display:block">
+            <a href="#system-design" class="nav-link" onclick="activateLink(this)">The Anti-Freeze Protocol</a>
+        </div>
+    </div>
+    
+        <div class="category">
+            <h3 onclick="toggleCategory('1theslidingwindowtwopointers')">1. The "Sliding Window" & "Two Pointers"</h3>
+            <div id="cat-1theslidingwindowtwopointers" class="problem-list">
+        
+                <a href="#prob-trappingrainwater" class="nav-link" onclick="activateLink(this)">Trapping Rain Water</a>
+            
+                <a href="#prob-minimumwindowsubstring" class="nav-link" onclick="activateLink(this)">Minimum Window Substring</a>
+            
+                <a href="#prob-slidingwindowmaximum" class="nav-link" onclick="activateLink(this)">Sliding Window Maximum</a>
+            </div></div>
+        <div class="category">
+            <h3 onclick="toggleCategory('2thebinarysearchonanswers')">2. The "Binary Search" (on Answers)</h3>
+            <div id="cat-2thebinarysearchonanswers" class="problem-list">
+        
+                <a href="#prob-medianoftwosortedarrays" class="nav-link" onclick="activateLink(this)">Median of Two Sorted Arrays</a>
+            
+                <a href="#prob-countofsmallernumbersafterself" class="nav-link" onclick="activateLink(this)">Count of Smaller Numbers After Self</a>
+            </div></div>
+        <div class="category">
+            <h3 onclick="toggleCategory('3theheappriorityqueue')">3. The "Heap" (Priority Queue)</h3>
+            <div id="cat-3theheappriorityqueue" class="problem-list">
+        
+                <a href="#prob-mergeksortedlists" class="nav-link" onclick="activateLink(this)">Merge k Sorted Lists</a>
+            
+                <a href="#prob-theskylineproblem" class="nav-link" onclick="activateLink(this)">The Skyline Problem</a>
+            </div></div>
+        <div class="category">
+            <h3 onclick="toggleCategory('4routesrecursiongraphsdp')">4. Routes & Recursion (Graphs / DP)</h3>
+            <div id="cat-4routesrecursiongraphsdp" class="problem-list">
+        
+                <a href="#prob-wordladderii" class="nav-link" onclick="activateLink(this)">Word Ladder II</a>
+            
+                <a href="#prob-aliendictionary" class="nav-link" onclick="activateLink(this)">Alien Dictionary</a>
+            
+                <a href="#prob-removeinvalidparentheses" class="nav-link" onclick="activateLink(this)">Remove Invalid Parentheses</a>
+            </div></div>
+        <div class="category">
+            <h3 onclick="toggleCategory('5planningsystemdesignbridges')">5. Planning (System Design Bridges)</h3>
+            <div id="cat-5planningsystemdesignbridges" class="problem-list">
+        
+                <a href="#prob-lrucache" class="nav-link" onclick="activateLink(this)">LRU Cache</a>
+            
+                <a href="#prob-designsearchautocompletesystem" class="nav-link" onclick="activateLink(this)">Design Search Autocomplete System</a>
+            </div></div>
+        </div>
+    </div>
+    
+    <div class="main">
+        <div class="content-container">
+            
+    <div id="system-design" class="pattern-section">
+        <div class="problem-block" style="padding: 30px;">
+            <div class="explanation-text"><pre># Google L6 System Design Protocol: "The Anti-Freeze"
+
+## The Core Philosophy
+Google L6 (Staff) interviews are not about "knowing the answer." They are about **NAVIGATING AMBIGUITY**.
+If you start drawing immediately, you fail.
+If you ask clarifying questions and then draw, you pass.
+
+## Phase 0: The Impulse Control (3 Minutes)
+**Trigger:** Recruiter says "Design X."
+**Action:** Put the pen down. Do NOT draw a box.
+**Script:**
+1.  "That's an interesting problem. Before I sketch anything, I want to align on the **functional** and **non-functional** requirements."
+2.  **Functional:** "Are we focusing on [Feature A] or [Feature B]?" (e.g., Video Upload vs Video Playback).
+3.  **Non-Functional:** "What is the scale? 1M users or 1B users? Is consistency critical (Banking) or is availability critical (Social Media)?"
+
+## Phase 1: The Back-of-Napkin Math (5 Minutes)
+**Action:** Write numbers on the whiteboard.
+**Script:**
+*   "DAU: 100M"
+*   "QPS: 100M / 100,000 sec ≈ 1,000 QPS average. Peak is 5x = 5,000 QPS."
+*   "Storage: 1KB per write * 100M = 100GB/day = 36TB/year."
+*   **Conclusion:** "Okay, 5k QPS is low enough for a standard LB, but 36TB/year means we need sharded storage."
+
+## Phase 2: The "Naive" Diagram (5 Minutes)
+**Action:** Draw the simplest *broken* solution.
+*   Client -> Load Balancer -> API Service -> Monolithic DB.
+*   **Say:** "This is the naive approach. It works for 1k users. It breaks at 1M because [Single Point of Failure / Latency]."
+
+## Phase 3: The "Staff" Optimization (25 Minutes)
+**Action:** specific deep dives based on constraints.
+*   "Since we need low latency, I'm adding a **Redis Cache** here."
+*   "Since we have 40PB of data, I'm sharding the DB by `user_id`."
+*   "Since we need global availability, I'm moving the read path to a **CDN**."
+
+## The "Cheat Sheet" for Components
+| Constraint | Component to Draw |
+|---|---|
+| "Too much read traffic" | **Replica DBs + Cache (Redis)** |
+| "Too much write traffic" | **Kafka (Buffering) + Cassandra/Dynamo (Write speed)** |
+| "Global Latency" | **CDN + Geo-DNS** |
+| "Complex Relationships" | **Graph DB (TAO/Neo4j)** |
+| "Full Text Search" | **ElasticSearch / Solr** |
+| "Analytics/Reporting" | **Data Warehouse (BigQuery/Redshift)** - *Never use Prod DB for analytics!* |
+
+## Practice Prompt
+**Design a Rate Limiter.**
+*   **Constraints:** 1B requests/hour.
+*   **Goal:** Prevent DDoS, protect API.
+*   **Twist:** It must be distributed (multiple servers).
+
+*Go.*
+</pre></div>
+        </div>
+    </div>
+    
+        <div id="pattern-1theslidingwindowtwopointers" class="pattern-section">
+            <h1 class="gradient-text">1. The "Sliding Window" & "Two Pointers"</h1>
+            <div class="card mnemonic-card">
+                <p><strong>Analogy:</strong> 🐛 **The Hungry Caterpillar**.</p>
+                <p class="highlight"><strong>Mnemonic:</strong> "Expand to Valid, Shrink to Win."</p>
+            </div>
+        
+            <div id="prob-trappingrainwater" class="problem-block">
+                <div class="problem-header">
+                    <h2>Trapping Rain Water</h2>
+                    <span class="badge">_01_trapping_rain_water.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-trappingrainwater')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-trappingrainwater')">Code</button>
+                    <a href="https://www.google.com/search?q=Trapping Rain Water+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-trappingrainwater" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Trapping Rain Water
+DIFFICULTY: Hard
+TIME LIMIT: 30 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Python Two Pointers): https://www.youtube.com/watch?v=ZI2z5pq0TqA
+- Tushar Roy (Stack & Two Pointers): https://www.youtube.com/watch?v=KV-Eq3wYFCI
+- Take U Forward (Detailed Walkthrough): https://www.youtube.com/watch?v=m18Hntz4go8
+
+Given n non-negative integers representing an elevation map where the width of each bar is 1, 
+compute how much water it can trap after raining.
+
+Example 1:
+Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
+Output: 6
+Explanation: The above elevation map (black section) is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. 
+In this case, 6 units of rain water (blue section) are being trapped.
+
+Example 2:
+Input: height = [4,2,0,3,2,5]
+Output: 9
+
+Constraints:
+- n == height.length
+- 1 <= n <= 2 * 10^4
+- 0 <= height[i] <= 10^5
+
+APPROACH:
+There are multiple approaches:
+1. Dynamic Programming (Prefix/Suffix Max): O(N) Time, O(N) Space
+   - Precompute `left_max` and `right_max` arrays.
+   - Water at `i` = `min(left_max[i], right_max[i]) - height[i]`
+
+2. Two Pointers: O(N) Time, O(1) Space (Optimal)
+   - Maintain `left` and `right` pointers.
+   - Also maintain `max_l` and `max_r`.
+   - If `max_l < max_r`, we know the bottleneck is on the left side (or equal), so we can fill water at `left` based on `max_l`.
+   - Move the pointer with the smaller max height inward.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-trappingrainwater" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: Trapping Rain Water
+DIFFICULTY: Hard
+TIME LIMIT: 30 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Python Two Pointers): https://www.youtube.com/watch?v=ZI2z5pq0TqA
+- Tushar Roy (Stack & Two Pointers): https://www.youtube.com/watch?v=KV-Eq3wYFCI
+- Take U Forward (Detailed Walkthrough): https://www.youtube.com/watch?v=m18Hntz4go8
+
+Given n non-negative integers representing an elevation map where the width of each bar is 1, 
+compute how much water it can trap after raining.
+
+Example 1:
+Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
+Output: 6
+Explanation: The above elevation map (black section) is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. 
+In this case, 6 units of rain water (blue section) are being trapped.
+
+Example 2:
+Input: height = [4,2,0,3,2,5]
+Output: 9
+
+Constraints:
+- n == height.length
+- 1 <= n <= 2 * 10^4
+- 0 <= height[i] <= 10^5
+
+APPROACH:
+There are multiple approaches:
+1. Dynamic Programming (Prefix/Suffix Max): O(N) Time, O(N) Space
+   - Precompute `left_max` and `right_max` arrays.
+   - Water at `i` = `min(left_max[i], right_max[i]) - height[i]`
+
+2. Two Pointers: O(N) Time, O(1) Space (Optimal)
+   - Maintain `left` and `right` pointers.
+   - Also maintain `max_l` and `max_r`.
+   - If `max_l < max_r`, we know the bottleneck is on the left side (or equal), so we can fill water at `left` based on `max_l`.
+   - Move the pointer with the smaller max height inward.
+"""
+
+from typing import List
+
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        """
+        Calculates the amount of trapped water using the Two Pointers approach.
+        
+        This method computes the total amount of water that can be trapped between bars in an elevation map.
+        It uses a two-pointer strategy to efficiently calculate the water level at each position in a single pass.
+        
+        Algorithm:
+        ----------
+        The core idea is that the amount of water trapped at any position `i` is determined by:
+            water[i] = min(max_height_left[i], max_height_right[i]) - height[i]
+            
+        Instead of precomputing these max arrays (which takes O(N) space), we can use two pointers technique
+        because we only need the *minimum* of the two maximums to know the water level.
+        
+        1. Initialize `left` pointer at the start (0) and `right` pointer at the end (n-1).
+        2. Maintain `max_l` (maximum height seen from left) and `max_r` (maximum height seen from right).
+        3. At each step, compare `max_l` and `max_r`:
+            - If `max_l < max_r`: We know the water level at the `left` pointer is limited by `max_l` because 
+              there is a taller barrier somewhere to the right (`max_r`). 
+              So, water trapped = `max_l - height[left]`. Then move `left` forward.
+            - Else (`max_l >= max_r`): The key constraint is `max_r`. 
+              Water trapped = `max_r - height[right]`. Then move `right` backward.
+        
+        Time Complexity: O(N)
+            - We process each element of the array exactly once using the two pointers.
+            
+        Space Complexity: O(1)
+            - We only use a few variables (left, right, max_l, max_r, water) for storage.
+            
+        Args:
+            height (List[int]): A list of non-negative integers representing the elevation map.
+            
+        Returns:
+            int: The total amount of trapped water.
+        """
+        if not height:
+            return 0
+            
+        left, right = 0, len(height) - 1
+        max_l, max_r = height[left], height[right]
+        water = 0
+        
+        while left < right:
+            # We compare the MAX heights found so far on both ends.
+            # The logic relies on the fact that water level at any index i is determined by:
+            # min(max_height_to_left_of_i, max_height_to_right_of_i) - height[i]
+            
+            if max_l < max_r:
+                # If left side max is smaller, then the water level at 'left' pointer position is bound by max_l.
+                # Justification:
+                # 1. We know max_l is the highest wall to the left of current `left`.
+                # 2. We know max_r is *some* wall to the right of `left`.
+                # 3. Since max_l < max_r, the actual max_right for `left` is at least max_r, so min(max_l, actual_max_right) = max_l.
+                
+                # [PITFALL] We MUST move the pointer BEFORE calculating water for that position.
+                # Why? Because `max_l` initially includes `height[left]`. If we don't move, we are comparing the wall to itself.
+                # We want to calculate water for the *inner* positions.
+                left += 1
+                current_height = height[left]
+                
+                # Update max_l if the new bar is taller
+                # If the new bar is taller than previous max_l, it can't trap water relative to the left side,
+                # but it becomes the new boundary for subsequent positions.
+                max_l = max(max_l, current_height)
+                
+                # Add trapped water: (bounding height - current bar height)
+                # Since max_l is updated to be at least current_height (line above), this is guaranteed to be >= 0.
+                water += max_l - current_height
+                
+            else:
+                # If right side max is smaller (or equal), then the water level at 'right' is bound by max_r.
+                # Symmetric logic to the left side apply here.
+                right -= 1
+                current_height = height[right]
+                
+                # Update max_r
+                max_r = max(max_r, current_height)
+                
+                # Add trapped water
+                water += max_r - current_height
+                
+        return water
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1: Standard case
+    h1 = [0,1,0,2,1,0,1,3,2,1,2,1]
+    print(f"Test 1 Output: {solver.trap(h1)} (Expected: 6)")
+    
+    # Test 2: Bowl shape
+    h2 = [4,2,0,3,2,5]
+    print(f"Test 2 Output: {solver.trap(h2)} (Expected: 9)")
+    
+    # Test 3: No water possible (ascending)
+    h3 = [1,2,3,4,5]
+    print(f"Test 3 Output: {solver.trap(h3)} (Expected: 0)")
+</code></pre>
+                </div>
+            </div>
+            
+            <div id="prob-minimumwindowsubstring" class="problem-block">
+                <div class="problem-header">
+                    <h2>Minimum Window Substring</h2>
+                    <span class="badge">_07_minimum_window_substring.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-minimumwindowsubstring')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-minimumwindowsubstring')">Code</button>
+                    <a href="https://www.google.com/search?q=Minimum Window Substring+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-minimumwindowsubstring" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Minimum Window Substring
+DIFFICULTY: Hard
+TIME LIMIT: 40 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Sliding Window): https://www.youtube.com/watch?v=jSto0O4AJbM
+- Tech Dose (Explained): https://www.youtube.com/watch?v=eS6PZLjoaq8
+- Code in Motion (Animated): https://www.youtube.com/watch?v=U1q16AFcjKs
+
+Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window. 
+If there is no such substring, return the empty string "".
+
+The testcases will be generated such that the answer is unique.
+
+Example 1:
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+
+Example 2:
+Input: s = "a", t = "a"
+Output: "a"
+
+Example 3:
+Input: s = "a", t = "aa"
+Output: ""
+Explanation: Both 'a's from t must be included in the window.
+Since the largest window of s only has one 'a', return "".
+
+Constraints:
+- m == s.length
+- n == t.length
+- 1 <= m, n <= 10^5
+- s and t consist of uppercase and lowercase English letters.
+ 
+Follow up: Could you find an algorithm that runs in O(m + n) time?
+
+APPROACH: Sliding Window Optimization (Two Pointers)
+----------------------------------------------------
+We need to find the smallest contiguous subarray (window) that satisfies a condition. This screams "Sliding Window".
+
+Algorithm:
+1. **Target Frequency Map**: First, count the frequency of each char in `t`. This tells us what we NEED.
+2. **Current Window Map**: Maintain a frequency map of the current window in `s`.
+3. **Expand (Right Pointer)**: Move the `right` pointer to include characters into the window.
+   - Update the current window map.
+   - Check if the added character satisfies a requirement (i.e., we have enough of that specific char).
+   - Track `formed` variables: how many unique characters have met their target frequency.
+4. **Contract (Left Pointer)**: Once the window is valid (i.e., `formed == required`), try to shrink it from the left to minimize size.
+   - Record the current window size if it's the smallest seen so far.
+   - Remove the character at `left` pointer from the window.
+   - Update `formed` if the removal breaks a requirement.
+   - Increment `left` pointer.
+
+Time Complexity: O(M + N).
+- We construct the frequency map: O(N).
+- The sliding window pointers `left` and `right` each visit every character in `s` at most once: O(2M) = O(M).
+
+Space Complexity: O(1) mostly, or O(26/52) since alphabet size is fixed.
+
+Industry Nomenclature:
+- **Frequency Map / Hash Map**: Data structure to count occurrences.
+- **Two Pointers**: Technique using two indices to traverse data (often for subarrays).
+- **Invariant**: The condition "window contains all chars of t" must hold true before we try to shrink.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-minimumwindowsubstring" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: Minimum Window Substring
+DIFFICULTY: Hard
+TIME LIMIT: 40 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Sliding Window): https://www.youtube.com/watch?v=jSto0O4AJbM
+- Tech Dose (Explained): https://www.youtube.com/watch?v=eS6PZLjoaq8
+- Code in Motion (Animated): https://www.youtube.com/watch?v=U1q16AFcjKs
+
+Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window. 
+If there is no such substring, return the empty string "".
+
+The testcases will be generated such that the answer is unique.
+
+Example 1:
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+
+Example 2:
+Input: s = "a", t = "a"
+Output: "a"
+
+Example 3:
+Input: s = "a", t = "aa"
+Output: ""
+Explanation: Both 'a's from t must be included in the window.
+Since the largest window of s only has one 'a', return "".
+
+Constraints:
+- m == s.length
+- n == t.length
+- 1 <= m, n <= 10^5
+- s and t consist of uppercase and lowercase English letters.
+ 
+Follow up: Could you find an algorithm that runs in O(m + n) time?
+
+APPROACH: Sliding Window Optimization (Two Pointers)
+----------------------------------------------------
+We need to find the smallest contiguous subarray (window) that satisfies a condition. This screams "Sliding Window".
+
+Algorithm:
+1. **Target Frequency Map**: First, count the frequency of each char in `t`. This tells us what we NEED.
+2. **Current Window Map**: Maintain a frequency map of the current window in `s`.
+3. **Expand (Right Pointer)**: Move the `right` pointer to include characters into the window.
+   - Update the current window map.
+   - Check if the added character satisfies a requirement (i.e., we have enough of that specific char).
+   - Track `formed` variables: how many unique characters have met their target frequency.
+4. **Contract (Left Pointer)**: Once the window is valid (i.e., `formed == required`), try to shrink it from the left to minimize size.
+   - Record the current window size if it's the smallest seen so far.
+   - Remove the character at `left` pointer from the window.
+   - Update `formed` if the removal breaks a requirement.
+   - Increment `left` pointer.
+
+Time Complexity: O(M + N).
+- We construct the frequency map: O(N).
+- The sliding window pointers `left` and `right` each visit every character in `s` at most once: O(2M) = O(M).
+
+Space Complexity: O(1) mostly, or O(26/52) since alphabet size is fixed.
+
+Industry Nomenclature:
+- **Frequency Map / Hash Map**: Data structure to count occurrences.
+- **Two Pointers**: Technique using two indices to traverse data (often for subarrays).
+- **Invariant**: The condition "window contains all chars of t" must hold true before we try to shrink.
+"""
+
+from typing import List
+from collections import Counter
+
+class Solution:
+    def minWindow(self, s: str, t: str) -> str:
+        if not t or not s:
+            return ""
+            
+        # Dictionary which keeps a count of all the unique characters in t.
+        dict_t = Counter(t)
+        
+        # Number of unique characters in t, which need to be present in the desired window.
+        required = len(dict_t)
+        
+        # Filter all the characters from s into a new list along with their index.
+        # The filtering criteria is that the character should be present in t.
+        # This is an optional optimization but helps visualize focusing only on relevant chars.
+        # However, for generic implementation, we just iterate s directly.
+        
+        # 'l, r' denote the starting and ending indices of the window.
+        l, r = 0, 0
+        
+        # `formed` is used to keep track of how many unique characters in t
+        # are present in the current window in its desired frequency.
+        # e.g., if t="AABC" then 'A' must appear twice. 'B' once, 'C' once.
+        # satisfying 'A' (count >= 2) increments formed by 1.
+        formed = 0
+        
+        # Dictionary which keeps a count of all the unique characters in the current window.
+        window_counts = {}
+        
+        # ans tuple of the form (window length, left, right)
+        # Initialize with infinity length
+        ans = float("inf"), None, None
+        
+        while r < len(s):
+            # Add character from the right to the window
+            character = s[r]
+            window_counts[character] = window_counts.get(character, 0) + 1
+            
+            # If the frequency of the current character added equals to the desired count in t
+            # then increment the formed count by 1.
+            # CAUTION: Only increment formed when it EXACTLY matches the requirement.
+            # If we need 2 'A's and we now have 3 'A's, we don't increment formed again.
+            # [PITFALL] Only increment formed when it EXACTLY matches the requirement.
+            # If we need 2 'A's and we now have 3 'A's, we don't increment formed again.
+            if character in dict_t and window_counts[character] == dict_t[character]:
+                formed += 1
+                
+            # Try and contract the window till the point where it ceases to be 'desirable'.
+            while l <= r and formed == required:
+                character = s[l]
+                
+                # Save the smallest window until now.
+                if r - l + 1 < ans[0]:
+                    ans = (r - l + 1, l, r)
+                    
+                # The character at the position pointed by the `left` pointer is no longer a part of the window.
+                window_counts[character] -= 1
+                
+                # Check if removing this char breaks the "valid window" property
+                if character in dict_t and window_counts[character] < dict_t[character]:
+                    formed -= 1
+                    
+                # Move the left pointer ahead, this would help to look for a new window.
+                l += 1    
+                
+            # Keep expanding the window once we are done contracting.
+            r += 1
+            
+        return "" if ans[0] == float("inf") else s[ans[1] : ans[2] + 1]
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1
+    s = "ADOBECODEBANC"
+    t = "ABC"
+    print(f"Test 1: {solver.minWindow(s, t)} (Expected: 'BANC')")
+    
+    # Test 2
+    s = "a"
+    t = "a"
+    print(f"Test 2: {solver.minWindow(s, t)} (Expected: 'a')")
+    
+    # Test 3
+    s = "a"
+    t = "aa"
+    print(f"Test 3: {solver.minWindow(s, t)} (Expected: '')")
+</code></pre>
+                </div>
+            </div>
+            
+            <div id="prob-slidingwindowmaximum" class="problem-block">
+                <div class="problem-header">
+                    <h2>Sliding Window Maximum</h2>
+                    <span class="badge">_11_sliding_window_maximum.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-slidingwindowmaximum')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-slidingwindowmaximum')">Code</button>
+                    <a href="https://www.google.com/search?q=Sliding Window Maximum+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-slidingwindowmaximum" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Sliding Window Maximum
+DIFFICULTY: Hard
+TIME LIMIT: 35 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Monotonic Queue): https://www.youtube.com/watch?v=DfljaUwZsOk
+- Geekific (Deque Explained): https://www.youtube.com/watch?v=LiNtADMqTfg
+- Tushar Roy (Brute Force to Optimal): https://www.youtube.com/watch?v=J6o_Wz-UGvc
+
+You are given an array of integers `nums`, there is a sliding window of size `k` which is moving from the very left 
+of the array to the very right. You can only see the `k` numbers in the window. 
+Each time the sliding window moves right by one position.
+
+Return the max sliding window.
+
+Example 1:
+Input: nums = [1,3,-1,-3,5,3,6,7], k = 3
+Output: [3,3,5,5,6,7]
+Explanation: 
+Window position                Max
+---------------               -----
+[1  3  -1] -3  5  3  6  7       3
+ 1 [3  -1  -3] 5  3  6  7       3
+ 1  3 [-1  -3  5] 3  6  7       5
+ 1  3  -1 [-3  5  3] 6  7       5
+ 1  3  -1  -3 [5  3  6] 7       6
+ 1  3  -1  -3  5 [3  6  7]      7
+
+Constraints:
+- 1 <= nums.length <= 10^5
+- -10^4 <= nums[i] <= 10^4
+- 1 <= k <= nums.length
+
+APPROACH: Monotonic Queue (Decreasing Deque)
+--------------------------------------------
+**The "Big Fish" Analogy:**
+Imagine the sliding window is a pond.
+- When a new fish (number) comes in, it eats all the smaller fish that were there before it.
+  Why? Because the new fish is Big AND Younger (will stay in the window longer).
+  The smaller fish that came before are now useless; they can never be the maximum again.
+- If a fish comes in that is smaller than the current biggest fish, it survives (for now).
+  Why? Because the big fish might leave the window (get too old), and this small fish might eventually become the biggest remaining fish.
+
+**Data Structure: Deque (Double-Ended Queue)**
+We need a structure that allows us to:
+1. Pop small elements from the **Back** (when a big fish comes in).
+2. Pop old elements from the **Front** (when they slide out of the window).
+3. Access the current max at the **Front**.
+
+**Step-by-Step Graphical Trace:**
+Input: `nums = [1, 3, -1, -3, 5, 3, 6, 7]`, `k = 3`
+
+| Step | Window View               | Current | Action (Big Fish Logic)               | Deque (Indices) | Deque (Values) | Result      |
+|------|---------------------------|---------|---------------------------------------|-----------------|----------------|-------------|
+| 0    | `[1] 3 -1 -3 ...`         | `1`     | Push 1                                | `[0]`           | `[1]`          | -           |
+| 1    | `[1 3] -1 -3 ...`         | `3`     | `3 > 1`! Pop 1. Push 3.               | `[1]`           | `[3]`          | -           |
+| 2    | `[1 3 -1] -3 ...`         | `-1`    | `-1 < 3`. Push -1.                    | `[1, 2]`        | `[3, -1]`      | `[3]`       |
+| 3    | `1 [3 -1 -3] 5 ...`       | `-3`    | `-3 < -1`. Push -3.                   | `[1, 2, 3]`     | `[3, -1, -3]`  | `[3, 3]`    |
+| 4    | `1 3 [-1 -3 5] 3 ...`     | `5`     | `5 > -3`, `5 > -1`, `5 > 3`. Pop all. | `[4]`           | `[5]`          | `[3, 3, 5]` |
+| 5    | `1 3 -1 [-3 5 3] 6 ...`   | `3`     | `3 < 5`. Push 3.                      | `[4, 5]`        | `[5, 3]`       | `..., 5]`   |
+| 6    | `... -3 [5 3 6] 7`        | `6`     | `6 > 3`, `6 > 5`. Pop all.            | `[6]`           | `[6]`          | `..., 6]`   |
+| 7    | `... 5 3 [6 7]`           | `7`     | `7 > 6`. Pop 6.                       | `[7]`           | `[7]`          | `..., 7]`   |
+
+**Key Concept:**
+Notice how the Deque (Values) is ALWAYS sorted: `[3, -1, -3]`, `[5, 3]`.
+This is why the Front is always the Maximum.
+
+**Key "Invariant":**
+The deque is always sorted in **Strictly Decreasing Order** of values.
+The front always holds the index of the largest element in the current window.
+
+Time Complexity: O(N). Each element is added once and removed at most once.
+Space Complexity: O(k). The deque stores at most k elements.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-slidingwindowmaximum" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: Sliding Window Maximum
+DIFFICULTY: Hard
+TIME LIMIT: 35 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Monotonic Queue): https://www.youtube.com/watch?v=DfljaUwZsOk
+- Geekific (Deque Explained): https://www.youtube.com/watch?v=LiNtADMqTfg
+- Tushar Roy (Brute Force to Optimal): https://www.youtube.com/watch?v=J6o_Wz-UGvc
+
+You are given an array of integers `nums`, there is a sliding window of size `k` which is moving from the very left 
+of the array to the very right. You can only see the `k` numbers in the window. 
+Each time the sliding window moves right by one position.
+
+Return the max sliding window.
+
+Example 1:
+Input: nums = [1,3,-1,-3,5,3,6,7], k = 3
+Output: [3,3,5,5,6,7]
+Explanation: 
+Window position                Max
+---------------               -----
+[1  3  -1] -3  5  3  6  7       3
+ 1 [3  -1  -3] 5  3  6  7       3
+ 1  3 [-1  -3  5] 3  6  7       5
+ 1  3  -1 [-3  5  3] 6  7       5
+ 1  3  -1  -3 [5  3  6] 7       6
+ 1  3  -1  -3  5 [3  6  7]      7
+
+Constraints:
+- 1 <= nums.length <= 10^5
+- -10^4 <= nums[i] <= 10^4
+- 1 <= k <= nums.length
+
+APPROACH: Monotonic Queue (Decreasing Deque)
+--------------------------------------------
+**The "Big Fish" Analogy:**
+Imagine the sliding window is a pond.
+- When a new fish (number) comes in, it eats all the smaller fish that were there before it.
+  Why? Because the new fish is Big AND Younger (will stay in the window longer).
+  The smaller fish that came before are now useless; they can never be the maximum again.
+- If a fish comes in that is smaller than the current biggest fish, it survives (for now).
+  Why? Because the big fish might leave the window (get too old), and this small fish might eventually become the biggest remaining fish.
+
+**Data Structure: Deque (Double-Ended Queue)**
+We need a structure that allows us to:
+1. Pop small elements from the **Back** (when a big fish comes in).
+2. Pop old elements from the **Front** (when they slide out of the window).
+3. Access the current max at the **Front**.
+
+**Step-by-Step Graphical Trace:**
+Input: `nums = [1, 3, -1, -3, 5, 3, 6, 7]`, `k = 3`
+
+| Step | Window View               | Current | Action (Big Fish Logic)               | Deque (Indices) | Deque (Values) | Result      |
+|------|---------------------------|---------|---------------------------------------|-----------------|----------------|-------------|
+| 0    | `[1] 3 -1 -3 ...`         | `1`     | Push 1                                | `[0]`           | `[1]`          | -           |
+| 1    | `[1 3] -1 -3 ...`         | `3`     | `3 > 1`! Pop 1. Push 3.               | `[1]`           | `[3]`          | -           |
+| 2    | `[1 3 -1] -3 ...`         | `-1`    | `-1 < 3`. Push -1.                    | `[1, 2]`        | `[3, -1]`      | `[3]`       |
+| 3    | `1 [3 -1 -3] 5 ...`       | `-3`    | `-3 < -1`. Push -3.                   | `[1, 2, 3]`     | `[3, -1, -3]`  | `[3, 3]`    |
+| 4    | `1 3 [-1 -3 5] 3 ...`     | `5`     | `5 > -3`, `5 > -1`, `5 > 3`. Pop all. | `[4]`           | `[5]`          | `[3, 3, 5]` |
+| 5    | `1 3 -1 [-3 5 3] 6 ...`   | `3`     | `3 < 5`. Push 3.                      | `[4, 5]`        | `[5, 3]`       | `..., 5]`   |
+| 6    | `... -3 [5 3 6] 7`        | `6`     | `6 > 3`, `6 > 5`. Pop all.            | `[6]`           | `[6]`          | `..., 6]`   |
+| 7    | `... 5 3 [6 7]`           | `7`     | `7 > 6`. Pop 6.                       | `[7]`           | `[7]`          | `..., 7]`   |
+
+**Key Concept:**
+Notice how the Deque (Values) is ALWAYS sorted: `[3, -1, -3]`, `[5, 3]`.
+This is why the Front is always the Maximum.
+
+**Key "Invariant":**
+The deque is always sorted in **Strictly Decreasing Order** of values.
+The front always holds the index of the largest element in the current window.
+
+Time Complexity: O(N). Each element is added once and removed at most once.
+Space Complexity: O(k). The deque stores at most k elements.
+"""
+
+from typing import List
+from collections import deque
+
+class Solution:
+    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+        if not nums:
+            return []
+            
+        # Deque will store INDICES, not values.
+        # Storing indices allows us to easily check if an element is out of the window.
+        q = deque()
+        result = []
+        
+        for i in range(len(nums)):
+            # Step 1: Remove the index that is out of the current window from the LEFT
+            # The window range is [i - k + 1, i]
+            # Since the window moves 1 step at a time, at most ONE index (the oldest/front) will be out of bounds.
+            if q and q[0] < i - k + 1:
+                q.popleft()
+            
+            # Step 2: Maintain the "Decreasing" property
+            # [PITFALL] Monotonic Property.
+            # While the value at the BACK (q[-1]) is smaller than current value (nums[i]),
+            # remove it. It will never be the max because nums[i] is larger and lasts longer.
+            while q and nums[q[-1]] < nums[i]:
+                q.pop()
+            
+            # Step 3: Add current index
+            q.append(i)
+            
+            # Step 4: Add to result if window size is reached
+            # The first max is available when i == k - 1 (0-indexed)
+            if i >= k - 1:
+                # The front of the deque always has the index of the maximum element
+                result.append(nums[q[0]])
+                
+        return result
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1
+    nums = [1,3,-1,-3,5,3,6,7]
+    k = 3
+    print(f"Test 1: {solver.maxSlidingWindow(nums, k)} (Expected: [3,3,5,5,6,7])")
+    
+    # Test 2
+    nums = [1]
+    k = 1
+    print(f"Test 2: {solver.maxSlidingWindow(nums, k)} (Expected: [1])")
+    
+    # Test 3: Decreasing Array (Maximum is always the first element of window)
+    nums = [9, 8, 7, 6, 5]
+    k = 3
+    print(f"Test 3: {solver.maxSlidingWindow(nums, k)} (Expected: [9,8,7])")
+    
+    # Test 4: Increasing Array (Maximum is always the last element of window)
+    nums = [1, 2, 3, 4, 5]
+    k = 3
+    print(f"Test 4: {solver.maxSlidingWindow(nums, k)} (Expected: [3,4,5])")
+</code></pre>
+                </div>
+            </div>
+            </div>
+        <div id="pattern-2thebinarysearchonanswers" class="pattern-section">
+            <h1 class="gradient-text">2. The "Binary Search" (on Answers)</h1>
+            <div class="card mnemonic-card">
+                <p><strong>Analogy:</strong> � **The Dictionary Rip-Out**.</p>
+                <p class="highlight"><strong>Mnemonic:</strong> "Cut the Fat."</p>
+            </div>
+        
+            <div id="prob-medianoftwosortedarrays" class="problem-block">
+                <div class="problem-header">
+                    <h2>Median of Two Sorted Arrays</h2>
+                    <span class="badge">_02_median_two_sorted_arrays.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-medianoftwosortedarrays')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-medianoftwosortedarrays')">Code</button>
+                    <a href="https://www.google.com/search?q=Median of Two Sorted Arrays+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-medianoftwosortedarrays" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Median of Two Sorted Arrays
+DIFFICULTY: Hard
+TIME LIMIT: 40 Minutes
+
+Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.
+
+The overall run time complexity should be O(log (m+n)).
+
+VISUAL EXPLANATIONS:
+- NeetCode (Excellent Visualization): https://www.youtube.com/watch?v=q6IEA26hvXc
+- Take U Forward (Detailed Walkthrough): https://www.youtube.com/watch?v=NTop3VTjmxk
+- Tushar Roy (Logical Breakdown): https://www.youtube.com/watch?v=LPFhl65R7ww
+
+Example 1:
+Input: nums1 = [1,3], nums2 = [2]
+Output: 2.00000
+Explanation: merged array = [1,2,3] and median is 2.
+
+Example 2:
+Input: nums1 = [1,2], nums2 = [3,4]
+Output: 2.50000
+Explanation: merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5.
+
+Example 3:
+Input: nums1 = [0,0], nums2 = [0,0]
+Output: 0.00000
+
+Example 4:
+Input: nums1 = [], nums2 = [1]
+Output: 1.00000
+
+Example 5:
+Input: nums1 = [2], nums2 = []
+Output: 2.00000
+
+Constraints:
+- nums1.length == m
+- nums2.length == n
+- 0 <= m <= 1000
+- 0 <= n <= 1000
+- 1 <= m + n <= 2000
+- -10^6 <= nums1[i], nums2[i] <= 10^6
+
+APPROACH: Binary Search on Partition
+To achieve O(log(min(m, n))) complexity, we cannot simply merge the arrays (which would be O(m+n)).
+Instead, we need to find a partition point in both arrays such that:
+1. The left half of the combined array has the same number of elements as the right half (or one more).
+2. All elements on the left side (from both arrays) are <= all elements on the right side.
+
+Let's say we cut `nums1` at index `i` (meaning `nums1[0]...nums1[i-1]` are in the left half)
+and `nums2` at index `j` (meaning `nums2[0]...nums2[j-1]` are in the left half).
+
+The condition for a valid partition is:
+nums1[i-1] <= nums2[j]  AND  nums2[j-1] <= nums1[i]
+
+We perform binary search on the smaller array to find the correct `i`. `j` is then calculated based on `i` and the total length.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-medianoftwosortedarrays" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: Median of Two Sorted Arrays
+DIFFICULTY: Hard
+TIME LIMIT: 40 Minutes
+
+Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.
+
+The overall run time complexity should be O(log (m+n)).
+
+VISUAL EXPLANATIONS:
+- NeetCode (Excellent Visualization): https://www.youtube.com/watch?v=q6IEA26hvXc
+- Take U Forward (Detailed Walkthrough): https://www.youtube.com/watch?v=NTop3VTjmxk
+- Tushar Roy (Logical Breakdown): https://www.youtube.com/watch?v=LPFhl65R7ww
+
+Example 1:
+Input: nums1 = [1,3], nums2 = [2]
+Output: 2.00000
+Explanation: merged array = [1,2,3] and median is 2.
+
+Example 2:
+Input: nums1 = [1,2], nums2 = [3,4]
+Output: 2.50000
+Explanation: merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5.
+
+Example 3:
+Input: nums1 = [0,0], nums2 = [0,0]
+Output: 0.00000
+
+Example 4:
+Input: nums1 = [], nums2 = [1]
+Output: 1.00000
+
+Example 5:
+Input: nums1 = [2], nums2 = []
+Output: 2.00000
+
+Constraints:
+- nums1.length == m
+- nums2.length == n
+- 0 <= m <= 1000
+- 0 <= n <= 1000
+- 1 <= m + n <= 2000
+- -10^6 <= nums1[i], nums2[i] <= 10^6
+
+APPROACH: Binary Search on Partition
+To achieve O(log(min(m, n))) complexity, we cannot simply merge the arrays (which would be O(m+n)).
+Instead, we need to find a partition point in both arrays such that:
+1. The left half of the combined array has the same number of elements as the right half (or one more).
+2. All elements on the left side (from both arrays) are <= all elements on the right side.
+
+Let's say we cut `nums1` at index `i` (meaning `nums1[0]...nums1[i-1]` are in the left half)
+and `nums2` at index `j` (meaning `nums2[0]...nums2[j-1]` are in the left half).
+
+The condition for a valid partition is:
+nums1[i-1] <= nums2[j]  AND  nums2[j-1] <= nums1[i]
+
+We perform binary search on the smaller array to find the correct `i`. `j` is then calculated based on `i` and the total length.
+"""
+
+from typing import List
+
+class Solution:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
+        # Step 1: Ensure nums1 is the smaller array to minimize binary search range.
+        if len(nums1) > len(nums2):
+            return self.findMedianSortedArrays(nums2, nums1)
+
+        x, y = len(nums1), len(nums2)
+        low, high = 0, x
+        
+        while low <= high:
+            partitionX = (low + high) // 2
+            # partitionY is calculated such that the left half has (x + y + 1) // 2 elements.
+            # This ensures that for odd total length, the median is the max of the left half.
+            # [PITFALL] The +1 is critical! 
+            # It ensures that for ODD total length (x+y), the "Left" side gets the extra element.
+            # This makes the median logic consistent: median is max(Left) if odd.
+            partitionY = (x + y + 1) // 2 - partitionX
+            
+            # Handling edge cases where partition is at the far left (0) or far right (length)
+            # If partitionX is 0, it means nothing is there on left side. use -INF.
+            # If partitionX is n, it means nothing is there on right side. use +INF.
+            # [PITFALL] Boundary handling using Infinity.
+            # If partitionX == 0, there is nothing on the left of X, so we use -infinity to "lose" any max comparisons.
+            # If partitionX == x, there is nothing on the right of X, so we use +infinity to "lose" any min comparisons.
+            maxLeftX = float('-inf') if partitionX == 0 else nums1[partitionX - 1]
+            minRightX = float('inf') if partitionX == x else nums1[partitionX]
+            
+            maxLeftY = float('-inf') if partitionY == 0 else nums2[partitionY - 1]
+            minRightY = float('inf') if partitionY == y else nums2[partitionY]
+            
+            # Step 2: Check if we have found the correct partition
+            if maxLeftX <= minRightY and maxLeftY <= minRightX:
+                # Partitions are correct!
+                
+                # If total length is even:
+                if (x + y) % 2 == 0:
+                    return (max(maxLeftX, maxLeftY) + min(minRightX, minRightY)) / 2
+                # If total length is odd:
+                else:
+                    return max(maxLeftX, maxLeftY)
+                    
+            # Step 3: Adjust partition pointers
+            elif maxLeftX > minRightY:
+                # We are too far right in nums1. Move left.
+                high = partitionX - 1
+            else:
+                # We are too far left in nums1. Move right.
+                low = partitionX + 1
+                
+        raise ValueError("Input arrays are not sorted or invalid.")
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1
+    nums1 = [1, 3]
+    nums2 = [2]
+    # Merged: [1, 2, 3], Median: 2
+    print(f"Test 1: {solver.findMedianSortedArrays(nums1, nums2)} (Expected: 2.0)")
+
+    # Test 2
+    nums1 = [1, 2]
+    nums2 = [3, 4]
+    # Merged: [1, 2, 3, 4], Median: 2.5
+    print(f"Test 2: {solver.findMedianSortedArrays(nums1, nums2)} (Expected: 2.5)")
+    
+    # Test 3
+    nums1 = [0, 0]
+    nums2 = [0, 0]
+    print(f"Test 3: {solver.findMedianSortedArrays(nums1, nums2)} (Expected: 0.0)")
+</code></pre>
+                </div>
+            </div>
+            
+            <div id="prob-countofsmallernumbersafterself" class="problem-block">
+                <div class="problem-header">
+                    <h2>Count of Smaller Numbers After Self</h2>
+                    <span class="badge">_13_count_smaller_after_self.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-countofsmallernumbersafterself')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-countofsmallernumbersafterself')">Code</button>
+                    <a href="https://www.google.com/search?q=Count of Smaller Numbers After Self+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-countofsmallernumbersafterself" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Count of Smaller Numbers After Self
+DIFFICULTY: Hard
+TIME LIMIT: 45 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Merge Sort): https://www.youtube.com/watch?v=X0oXMdtUDwo
+- Tushar Roy (Binary Indexed Tree): https://www.youtube.com/watch?v=2SVLYsq5W8M
+- Aryan Mittal (Merge Sort & Fenwick): https://www.youtube.com/watch?v=_s4W1W2eA6M
+
+You are given an integer array `nums` and you have to return a new counts array. 
+The counts array has the property where `counts[i]` is the number of smaller elements to the right of `nums[i]`.
+
+Example 1:
+Input: nums = [5,2,6,1]
+Output: [2,1,1,0]
+Explanation:
+To the right of 5 there are 2 smaller elements (2 and 1).
+To the right of 2 there is 1 smaller element (1).
+To the right of 6 there is 1 smaller element (1).
+To the right of 1 there is 0 smaller elements.
+
+Example 2:
+Input: nums = [-1]
+Output: [0]
+
+Example 3:
+Input: nums = [-1,-1]
+Output: [0,0]
+
+Constraints:
+- 1 <= nums.length <= 10^5
+- -10^4 <= nums[i] <= 10^4
+
+APPROACH: Merge Sort (Divide and Conquer)
+-----------------------------------------
+This problem is related to finding **inversions** in an array.
+A naive O(N^2) solution checking every pair is too slow. We need O(N log N).
+
+We can modify Merge Sort.
+In standard Merge Sort, we split the array into left and right halves and then merge them.
+Counting Logic:
+When we pick `left_val` to place in the sorted array, we want to know how many elements from the RIGHT subarray have *already* "jumped" ahead of it.
+
+Correct Logic:
+During merge, we have `left_part` and `right_part`.
+We maintain pointers `i` (left) and `j` (right).
+We want to place the smaller element into the merged result.
+
+- If `right_part[j]` is smaller than `left_part[i]`:
+  `right_part[j]` "jumps" ahead of `left_part[i]`.
+  We increment `j` and place it in temp array.
+  We count this jump. A variable `right_counter` tracks how many elements from right have been placed.
+  
+- If `left_part[i]` is smaller or equal to `right_part[j]`:
+  We place `left_part[i]` into the temp array.
+  At this moment, we know exactly how many elements from the `right_part` were smaller than `left_part[i]`—it's exactly `j`!
+  Why? Because those `j` elements were already moved to the sorted array because they were smaller.
+  So, we add `j` to the count of `left_part[i]`.
+
+Important Implementation Detail:
+Since we sort the array, the elements move indices. We need to track their *original indices* to update the `counts` array correctly.
+So we store pairs `(value, original_index)`.
+
+Industry Nomenclature:
+- **Divide and Conquer**: Breaking a problem into subproblems, solving them, and combining results.
+- **Inversion Count**: A measure of how far an array is from being sorted.
+- **Stable Sort**: A sort that maintains the relative order of equal elements (important here).</pre>
+                    </div>
+                </div>
+                
+                <div id="code-countofsmallernumbersafterself" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: Count of Smaller Numbers After Self
+DIFFICULTY: Hard
+TIME LIMIT: 45 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Merge Sort): https://www.youtube.com/watch?v=X0oXMdtUDwo
+- Tushar Roy (Binary Indexed Tree): https://www.youtube.com/watch?v=2SVLYsq5W8M
+- Aryan Mittal (Merge Sort & Fenwick): https://www.youtube.com/watch?v=_s4W1W2eA6M
+
+You are given an integer array `nums` and you have to return a new counts array. 
+The counts array has the property where `counts[i]` is the number of smaller elements to the right of `nums[i]`.
+
+Example 1:
+Input: nums = [5,2,6,1]
+Output: [2,1,1,0]
+Explanation:
+To the right of 5 there are 2 smaller elements (2 and 1).
+To the right of 2 there is 1 smaller element (1).
+To the right of 6 there is 1 smaller element (1).
+To the right of 1 there is 0 smaller elements.
+
+Example 2:
+Input: nums = [-1]
+Output: [0]
+
+Example 3:
+Input: nums = [-1,-1]
+Output: [0,0]
+
+Constraints:
+- 1 <= nums.length <= 10^5
+- -10^4 <= nums[i] <= 10^4
+
+APPROACH: Merge Sort (Divide and Conquer)
+-----------------------------------------
+This problem is related to finding **inversions** in an array.
+A naive O(N^2) solution checking every pair is too slow. We need O(N log N).
+
+We can modify Merge Sort.
+In standard Merge Sort, we split the array into left and right halves and then merge them.
+Counting Logic:
+When we pick `left_val` to place in the sorted array, we want to know how many elements from the RIGHT subarray have *already* "jumped" ahead of it.
+
+Correct Logic:
+During merge, we have `left_part` and `right_part`.
+We maintain pointers `i` (left) and `j` (right).
+We want to place the smaller element into the merged result.
+
+- If `right_part[j]` is smaller than `left_part[i]`:
+  `right_part[j]` "jumps" ahead of `left_part[i]`.
+  We increment `j` and place it in temp array.
+  We count this jump. A variable `right_counter` tracks how many elements from right have been placed.
+  
+- If `left_part[i]` is smaller or equal to `right_part[j]`:
+  We place `left_part[i]` into the temp array.
+  At this moment, we know exactly how many elements from the `right_part` were smaller than `left_part[i]`—it's exactly `j`!
+  Why? Because those `j` elements were already moved to the sorted array because they were smaller.
+  So, we add `j` to the count of `left_part[i]`.
+
+Important Implementation Detail:
+Since we sort the array, the elements move indices. We need to track their *original indices* to update the `counts` array correctly.
+So we store pairs `(value, original_index)`.
+
+Industry Nomenclature:
+- **Divide and Conquer**: Breaking a problem into subproblems, solving them, and combining results.
+- **Inversion Count**: A measure of how far an array is from being sorted.
+- **Stable Sort**: A sort that maintains the relative order of equal elements (important here).
+"""
+
+from typing import List
+
+class Solution:
+    def countSmaller(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        # Store (val, original_index) to track where to add counts
+        arr = [[v, i] for i, v in enumerate(nums)]
+        result = [0] * n
+        
+        def merge_sort(enum):
+            if len(enum) <= 1:
+                return enum
+            
+            mid = len(enum) // 2
+            left = merge_sort(enum[:mid])
+            right = merge_sort(enum[mid:])
+            
+            return merge(left, right)
+        
+        def merge(left, right):
+            merged = []
+            i, j = 0, 0
+            
+            # During merge, we count how many elements from 'right' are smaller than 'left[i]'
+            # But wait, to make it easier:
+            # If we sort in ASCENDING order:
+            # When we pick left[i], we want to know how many items from right were *already picked* (meaning they were smaller).
+            num_elems_right_smaller_than_current_left = 0
+            
+            while i < len(left) and j < len(right):
+                if left[i][0] <= right[j][0]:
+                    # left[i] is smaller. It is placed in merged.
+                    # At this point, 'j' elements from right have been processed.
+                    # Those 'j' elements were all strictly smaller than left[i] (because they were picked first!).
+                    # So we add 'j' to left[i]'s count.
+                    # [PITFALL] Index Mapping.
+                    # We must update the count for the *original* index of the element.
+                    # 'j' represents the number of elements from the right subarray that jumped ahead.
+                    result[left[i][1]] += j
+                    merged.append(left[i])
+                    i += 1
+                else:
+                    # right[j] is smaller. It "jumps" ahead.
+                    # We don't update counts here because right elements don't care about left elements (problem is "smaller AFTER self").
+                    merged.append(right[j])
+                    j += 1
+            
+            # Remaining elements
+            while i < len(left):
+                # All remaining left elements are larger than ALL right elements processed so far.
+                # So they effectively have 'len(right)' (or current j) smaller elements from the right side.
+                result[left[i][1]] += j
+                merged.append(left[i])
+                i += 1
+            
+            while j < len(right):
+                merged.append(right[j])
+                j += 1
+                
+            return merged
+
+        merge_sort(arr)
+        return result
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1
+    nums = [5, 2, 6, 1]
+    # 5: [2, 1] -> 2
+    # 2: [1] -> 1
+    # 6: [1] -> 1
+    # 1: [] -> 0
+    print(f"Test 1: {solver.countSmaller(nums)} (Expected: [2, 1, 1, 0])")
+    
+    # Test 2
+    nums = [-1]
+    print(f"Test 2: {solver.countSmaller(nums)} (Expected: [0])")
+    
+    # Test 3
+    nums = [-1, -1]
+    print(f"Test 3: {solver.countSmaller(nums)} (Expected: [0, 0])")
+</code></pre>
+                </div>
+            </div>
+            </div>
+        <div id="pattern-3theheappriorityqueue" class="pattern-section">
+            <h1 class="gradient-text">3. The "Heap" (Priority Queue)</h1>
+            <div class="card mnemonic-card">
+                <p><strong>Analogy:</strong> � **The ER Triage Doctor**.</p>
+                <p class="highlight"><strong>Mnemonic:</strong> "VIP Only."</p>
+            </div>
+        
+            <div id="prob-mergeksortedlists" class="problem-block">
+                <div class="problem-header">
+                    <h2>Merge k Sorted Lists</h2>
+                    <span class="badge">_03_merge_k_sorted_lists.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-mergeksortedlists')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-mergeksortedlists')">Code</button>
+                    <a href="https://www.google.com/search?q=Merge k Sorted Lists+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-mergeksortedlists" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Merge k Sorted Lists
+DIFFICULTY: Hard
+TIME LIMIT: 25 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Min Heap): https://www.youtube.com/watch?v=q5a5OiGbT6Q
+- Take U Forward (Priority Queue): https://www.youtube.com/watch?v=kpCesr9VXDA
+- Sweet Logic (Divide & Conquer vs Heap): https://www.youtube.com/watch?v=PTBxKk6xVXs
+
+You are given an array of k linked-lists lists, each linked-list is sorted in ascending order.
+Merge all the linked-lists into one sorted linked-list and return it.
+
+Example 1:
+Input: lists = [[1,4,5],[1,3,4],[2,6]]
+Output: [1,1,2,3,4,4,5,6]
+Explanation: The linked-lists are:
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+merging them into one sorted list:
+1->1->2->3->4->4->5->6
+
+Example 2:
+Input: lists = []
+Output: []
+
+Example 3:
+Input: lists = [[]]
+Output: []
+
+Constraints:
+- k == lists.length
+- 0 <= k <= 10^4
+- 0 <= lists[i].length <= 500
+- -10^4 <= lists[i][j] <= 10^4
+- lists[i] is sorted in ascending order.
+- The sum of lists[i].length will not exceed 10^4.
+
+APPROACH: Min-Heap (Priority Queue)
+---------------------------------
+This problem is a classic application of a Min-Heap (or Priority Queue).
+We want to repeatedly find the smallest element among the heads of the `k` lists to build our sorted result.
+
+Algorithm:
+1. Initialize a Min-Heap.
+2. Push the head of each of the `k` linked lists onto the heap.
+   - We store a tuple `(val, index, node)` in the heap.
+   - `val`: The value of the node (primary sorting key).
+   - `index`: A unique index (tie-breaker). This is crucial in Python because `ListNode` objects are not comparable by default. If two nodes have the same value, Python attempts to compare the next element in the tuple. If that were the `node` itself, it would crash. The `index` ensures we never compare nodes directly.
+   - `node`: The reference to the node itself, so we can access `.next`.
+3. While the heap is not empty:
+   - Pop the smallest element `(val, i, node)` from the heap.
+   - Append this `node` to our `result` linked list.
+   - If `node.next` exists, push `(node.next.val, i, node.next)` onto the heap.
+4. Return the head of the merged list (using a dummy head to simplify edge cases).
+
+Time Complexity: O(N log k)
+- N is the total number of nodes across all lists.
+- k is the number of linked lists.
+- We perform exactly N pop operations and up to N push operations.
+- The heap size never exceeds k.
+- Each heap operation (push/pop) allows O(log k).
+- Total time: N * O(log k) = O(N log k).
+
+Space Complexity: O(k)
+- The heap stores at most k elements (one per list) at any given time.
+- The result list is just a rearranging of existing nodes (or new nodes depending on implementation), but the auxiliary space for the algorithm is O(k) for the heap.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-mergeksortedlists" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: Merge k Sorted Lists
+DIFFICULTY: Hard
+TIME LIMIT: 25 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Min Heap): https://www.youtube.com/watch?v=q5a5OiGbT6Q
+- Take U Forward (Priority Queue): https://www.youtube.com/watch?v=kpCesr9VXDA
+- Sweet Logic (Divide & Conquer vs Heap): https://www.youtube.com/watch?v=PTBxKk6xVXs
+
+You are given an array of k linked-lists lists, each linked-list is sorted in ascending order.
+Merge all the linked-lists into one sorted linked-list and return it.
+
+Example 1:
+Input: lists = [[1,4,5],[1,3,4],[2,6]]
+Output: [1,1,2,3,4,4,5,6]
+Explanation: The linked-lists are:
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+merging them into one sorted list:
+1->1->2->3->4->4->5->6
+
+Example 2:
+Input: lists = []
+Output: []
+
+Example 3:
+Input: lists = [[]]
+Output: []
+
+Constraints:
+- k == lists.length
+- 0 <= k <= 10^4
+- 0 <= lists[i].length <= 500
+- -10^4 <= lists[i][j] <= 10^4
+- lists[i] is sorted in ascending order.
+- The sum of lists[i].length will not exceed 10^4.
+
+APPROACH: Min-Heap (Priority Queue)
+---------------------------------
+This problem is a classic application of a Min-Heap (or Priority Queue).
+We want to repeatedly find the smallest element among the heads of the `k` lists to build our sorted result.
+
+Algorithm:
+1. Initialize a Min-Heap.
+2. Push the head of each of the `k` linked lists onto the heap.
+   - We store a tuple `(val, index, node)` in the heap.
+   - `val`: The value of the node (primary sorting key).
+   - `index`: A unique index (tie-breaker). This is crucial in Python because `ListNode` objects are not comparable by default. If two nodes have the same value, Python attempts to compare the next element in the tuple. If that were the `node` itself, it would crash. The `index` ensures we never compare nodes directly.
+   - `node`: The reference to the node itself, so we can access `.next`.
+3. While the heap is not empty:
+   - Pop the smallest element `(val, i, node)` from the heap.
+   - Append this `node` to our `result` linked list.
+   - If `node.next` exists, push `(node.next.val, i, node.next)` onto the heap.
+4. Return the head of the merged list (using a dummy head to simplify edge cases).
+
+Time Complexity: O(N log k)
+- N is the total number of nodes across all lists.
+- k is the number of linked lists.
+- We perform exactly N pop operations and up to N push operations.
+- The heap size never exceeds k.
+- Each heap operation (push/pop) allows O(log k).
+- Total time: N * O(log k) = O(N log k).
+
+Space Complexity: O(k)
+- The heap stores at most k elements (one per list) at any given time.
+- The result list is just a rearranging of existing nodes (or new nodes depending on implementation), but the auxiliary space for the algorithm is O(k) for the heap.
+"""
+
+from typing import List, Optional
+import heapq
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+        
+    def __repr__(self):
+        return f"{self.val} -> {self.next}"
+
+class Solution:
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        # Dummy head to simplify result list construction
+        dummy = ListNode(0)
+        curr = dummy
+        
+        # Min-heap to store (val, index, node)
+        # Using 'index' as a tie-breaker because ListNode doesn't support comparison.
+        # Although in Python 3, if first elements of tuple are equal, it compares the second.
+        # If we just stored (node.val, node), it would try to compare nodes if vals are equal, causing TypeError.
+        heap = []
+        
+        for i, node in enumerate(lists):
+            if node:
+                # [PITFALL] Why store 'i'?
+                # Tuple comparison works element by element.
+                # If values are equal (node.val), Python tries to compare the next element.
+                # If we stored (node.val, node), it would compare `node1 < node2`, which raises TypeError (ListNode not comparable).
+                # By adding unique 'i', we ensure the comparison breaks there and never reaches 'node'.
+                heapq.heappush(heap, (node.val, i, node))
+                
+        while heap:
+            val, i, node = heapq.heappop(heap)
+            
+            # Append node to result list
+            curr.next = node
+            curr = curr.next
+            
+            # If there is a next node in the source list, push it to heap
+            if node.next:
+                heapq.heappush(heap, (node.next.val, i, node.next))
+                
+        return dummy.next
+
+# Helper function to create linked list from list
+def create_linked_list(arr):
+    dummy = ListNode(0)
+    curr = dummy
+    for x in arr:
+        curr.next = ListNode(x)
+        curr = curr.next
+    return dummy.next
+
+# Helper function to print linked list
+def print_linked_list(node):
+    vals = []
+    while node:
+        vals.append(str(node.val))
+        node = node.next
+    return "->".join(vals)
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1
+    l1 = create_linked_list([1, 4, 5])
+    l2 = create_linked_list([1, 3, 4])
+    l3 = create_linked_list([2, 6])
+    lists = [l1, l2, l3]
+    
+    result = solver.mergeKLists(lists)
+    print(f"Test 1 Output: {print_linked_list(result)}")
+    # Expected: 1->1->2->3->4->4->5->6
+</code></pre>
+                </div>
+            </div>
+            
+            <div id="prob-theskylineproblem" class="problem-block">
+                <div class="problem-header">
+                    <h2>The Skyline Problem</h2>
+                    <span class="badge">_14_the_skyline_problem.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-theskylineproblem')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-theskylineproblem')">Code</button>
+                    <a href="https://www.google.com/search?q=The Skyline Problem+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-theskylineproblem" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: The Skyline Problem
+DIFFICULTY: Hard
+TIME LIMIT: 60 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Sweep Line + Max Heap): https://www.youtube.com/watch?v=FgfBkPyPfrY
+- Tushar Roy (Detailed Logic): https://www.youtube.com/watch?v=GSBLe8cKu0s
+- Happy Coding (Explanation): https://www.youtube.com/watch?v=8Kd-tzkQ9tU
+
+A city's skyline is the outer contour of the silhouette formed by all the buildings in that city when viewed from a distance. 
+Given the locations and heights of all the buildings, return the skyline formed by these buildings collectively.
+
+The geometric information of each building is given by a triplet `[left, right, height]`.
+The output is a list of "key points" `[x, y]` in the format of `[[x1,y1], [x2,y2], ...]`.
+A key point is the left endpoint of a horizontal line segment.
+
+Example 1:
+Input: buildings = [[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]]
+Output: [[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]
+
+Constraints:
+- 1 <= buildings.length <= 10^4
+- 0 <= left < right <= 2^31 - 1
+- 1 <= height <= 2^31 - 1
+- buildings is sorted by left edge.
+
+APPROACH: Sweep Line Algorithm + Max Heap
+-----------------------------------------
+We need to process the "critical points" where the height of the skyline *might* change.
+These critical points are the left and right edges of the buildings.
+
+Events:
+1. **Start of Building**: The max height might increase.
+2. **End of Building**: The max height might decrease.
+
+We can collect all these events and sort them by x-coordinate.
+If `x` coordinates are the same, we need careful tie-breaking:
+- If two buildings START, we process the taller one first (to record the max height immediately).
+- If two buildings END, we process the shorter one first? (Actually, it doesn't matter much for removal, but consistency helps).
+- If one STARTS and one ENDS: we must process START first. Why? If a building starts at `x` with height 10 and another ends at `x` with height 10, the skyline continues at 10. If we process End first, height drops to 0, then Start raises to 10 -> we get redundant (x,0), (x,10) points.
+  
+Standard Tie-Breaking Trick:
+- Represent Start as `(x, -height)` (Negative height makes taller start come first in sort).
+- Represent End as `(x, height)` (Positive height makes End come *after* Start).
+- Sort events.
+
+Data Structure:
+We need a container to store "active" building heights and efficiently return the maximum.
+A **Max Heap** is perfect.
+However, Python's `heapq` is a Min Heap (so we store negative heights), and it **Does Not Support Efficient Removal** of arbitrary elements (O(N) to remove).
+Since we need to remove a height when a building ends, we use a **Lazy Removal** strategy.
+- We maintain a `live_heap` of all started buildings.
+- We maintain a `past_heap` of all ended buildings.
+- When querying `max()`, we check if `live_heap.top() == past_heap.top()`. If so, it means the max building has actually ended. We pop both and repeat until `live_heap.top()` is truly alive.
+
+Algorithm:
+1. Create events list.
+2. Sort events.
+3. Iterate events.
+   - If Start: Push height to `live_heap`.
+   - If End: Push height to `past_heap` (mark for lazy removal).
+   - Clean heaps (lazy removal).
+   - Check current max height. If it differs from the last recorded skyline height, add a new key point `[x, current_max]`.
+
+Time Complexity: O(N log N) - Sorting events. Heap operations are log N.
+Space Complexity: O(N) - Storing events and heap.
+
+Industry Nomenclature:
+- **Sweep Line**: A conceptual vertical line moving across the plane, processing events at specific coordinates.
+- **Lazy Removal / Lazy Deletion**: Marking an item as deleted rather than physically removing it immediately, cleaning up later when accessing the item.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-theskylineproblem" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: The Skyline Problem
+DIFFICULTY: Hard
+TIME LIMIT: 60 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Sweep Line + Max Heap): https://www.youtube.com/watch?v=FgfBkPyPfrY
+- Tushar Roy (Detailed Logic): https://www.youtube.com/watch?v=GSBLe8cKu0s
+- Happy Coding (Explanation): https://www.youtube.com/watch?v=8Kd-tzkQ9tU
+
+A city's skyline is the outer contour of the silhouette formed by all the buildings in that city when viewed from a distance. 
+Given the locations and heights of all the buildings, return the skyline formed by these buildings collectively.
+
+The geometric information of each building is given by a triplet `[left, right, height]`.
+The output is a list of "key points" `[x, y]` in the format of `[[x1,y1], [x2,y2], ...]`.
+A key point is the left endpoint of a horizontal line segment.
+
+Example 1:
+Input: buildings = [[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]]
+Output: [[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]
+
+Constraints:
+- 1 <= buildings.length <= 10^4
+- 0 <= left < right <= 2^31 - 1
+- 1 <= height <= 2^31 - 1
+- buildings is sorted by left edge.
+
+APPROACH: Sweep Line Algorithm + Max Heap
+-----------------------------------------
+We need to process the "critical points" where the height of the skyline *might* change.
+These critical points are the left and right edges of the buildings.
+
+Events:
+1. **Start of Building**: The max height might increase.
+2. **End of Building**: The max height might decrease.
+
+We can collect all these events and sort them by x-coordinate.
+If `x` coordinates are the same, we need careful tie-breaking:
+- If two buildings START, we process the taller one first (to record the max height immediately).
+- If two buildings END, we process the shorter one first? (Actually, it doesn't matter much for removal, but consistency helps).
+- If one STARTS and one ENDS: we must process START first. Why? If a building starts at `x` with height 10 and another ends at `x` with height 10, the skyline continues at 10. If we process End first, height drops to 0, then Start raises to 10 -> we get redundant (x,0), (x,10) points.
+  
+Standard Tie-Breaking Trick:
+- Represent Start as `(x, -height)` (Negative height makes taller start come first in sort).
+- Represent End as `(x, height)` (Positive height makes End come *after* Start).
+- Sort events.
+
+Data Structure:
+We need a container to store "active" building heights and efficiently return the maximum.
+A **Max Heap** is perfect.
+However, Python's `heapq` is a Min Heap (so we store negative heights), and it **Does Not Support Efficient Removal** of arbitrary elements (O(N) to remove).
+Since we need to remove a height when a building ends, we use a **Lazy Removal** strategy.
+- We maintain a `live_heap` of all started buildings.
+- We maintain a `past_heap` of all ended buildings.
+- When querying `max()`, we check if `live_heap.top() == past_heap.top()`. If so, it means the max building has actually ended. We pop both and repeat until `live_heap.top()` is truly alive.
+
+Algorithm:
+1. Create events list.
+2. Sort events.
+3. Iterate events.
+   - If Start: Push height to `live_heap`.
+   - If End: Push height to `past_heap` (mark for lazy removal).
+   - Clean heaps (lazy removal).
+   - Check current max height. If it differs from the last recorded skyline height, add a new key point `[x, current_max]`.
+
+Time Complexity: O(N log N) - Sorting events. Heap operations are log N.
+Space Complexity: O(N) - Storing events and heap.
+
+Industry Nomenclature:
+- **Sweep Line**: A conceptual vertical line moving across the plane, processing events at specific coordinates.
+- **Lazy Removal / Lazy Deletion**: Marking an item as deleted rather than physically removing it immediately, cleaning up later when accessing the item.
+"""
+
+from typing import List
+import heapq
+
+class Solution:
+    def getSkyline(self, buildings: List[List[int]]) -> List[List[int]]:
+        # 1. Create Events
+        # Start: (x, -height). End: (x, height).
+        events = []
+        for l, r, h in buildings:
+            events.append((l, -h)) 
+            events.append((r, h))
+            
+        # 2. Sort Events
+        # Sort by x. Tie break: -h before h.
+        # This handles:
+        # - Start before End at same x (-h < h)
+        # - Taller start before Shorter start (-10 < -5)
+        # - Shorter end before Taller end (5 < 10) -> Removal order less critical, but consistent.
+        # [PITFALL] Sorting Order is Critical.
+        # 1. Sort by x-coordinate.
+        # 2. Tie-break:
+        #    - Start (-h) comes before End (h) since negative < positive.
+        #      This prevents gaps: if one building starts where another ends, we process start first to maintain max height.
+        #    - Taller Start (-10) comes before Shorter Start (-5).
+        #    - Shorter End (5) comes before Taller End (10).
+        events.sort()
+        
+        # 3. Setup Heaps
+        # We need a dummy 0 height building that represents "ground" and never ends.
+        # This simplifies logic so heap is never empty.
+        live_heap = [0] # Stores -height (Max Heap behavior)
+        past_heap = []  # Stores -height of removed buildings
+        
+        result = [[0, 0]] # Dummy start
+        
+        for x, h in events:
+            if h < 0:
+                # START event: h is negative. Push it to live_heap.
+                # (Remember heap stores -height to simulate max heap, so we push h directly)
+                heapq.heappush(live_heap, h)
+            else:
+                # END event: h is positive.
+                # We need to remove the corresponding building (height h).
+                # In our heap, heights are stored as negative. So we push -h to past_heap.
+                heapq.heappush(past_heap, -h)
+                
+            # Lazy Removal
+            # Remove heights from top of live_heap if they are in past_heap
+            while past_heap and live_heap[0] == past_heap[0]:
+                heapq.heappop(live_heap)
+                heapq.heappop(past_heap)
+            
+            # Current max height is -live_heap[0]
+            current_max = -live_heap[0]
+            
+            # If max height changes, record a key point
+            if result[-1][1] != current_max:
+                result.append([x, current_max])
+                
+        # Remove dummy start result [0,0] if it's redundant (e.g. first building starts at 2)
+        return result[1:]
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1
+    buildings = [[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]]
+    # Expected: [[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]
+    print(f"Test 1: {solver.getSkyline(buildings)}")
+    
+    # Test 2: Touching buildings
+    buildings2 = [[0,2,3],[2,5,3]]
+    # Expected: [[0,3],[5,0]] (Merge into one flat line)
+    print(f"Test 2: {solver.getSkyline(buildings2)}")
+</code></pre>
+                </div>
+            </div>
+            </div>
+        <div id="pattern-4routesrecursiongraphsdp" class="pattern-section">
+            <h1 class="gradient-text">4. Routes & Recursion (Graphs / DP)</h1>
+            <div class="card mnemonic-card">
+                <p><strong>Analogy:</strong> 🌊 **The Tsunami (BFS)** vs � **The Lab Mouse (DFS)**.</p>
+                <p class="highlight"><strong>Mnemonic:</strong> "Layers (BFS) vs. Labyrinths (DFS)."</p>
+            </div>
+        
+            <div id="prob-wordladderii" class="problem-block">
+                <div class="problem-header">
+                    <h2>Word Ladder II</h2>
+                    <span class="badge">_04_word_ladder_ii.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-wordladderii')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-wordladderii')">Code</button>
+                    <a href="https://www.google.com/search?q=Word Ladder II+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-wordladderii" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Word Ladder II
+DIFFICULTY: Hard
+TIME LIMIT: 50 Minutes
+
+VISUAL EXPLANATIONS:
+- TECH DOSE (BFS + DFS Explained): https://www.youtube.com/watch?v=mIZJIuMpI2M
+- Happy Coding (Detailed Walkthrough): https://www.youtube.com/watch?v=DREVt7pMtrA
+- Tushar Roy (Graph Construction): https://www.youtube.com/watch?v=PblfDYmlW87
+
+A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words 
+beginWord -> s1 -> s2 -> ... -> sk such that:
+1. Every adjacent pair of words differs by a single letter.
+2. Every si for 1 <= i <= k is in wordList. Note that beginWord does not need to be in wordList.
+3. sk == endWord
+
+Given two words, beginWord and endWord, and a dictionary wordList, return ALL the shortest transformation sequences 
+from beginWord to endWord, or an empty list if no such sequence exists.
+
+Example 1:
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+Output: [["hit","hot","dot","dog","cog"],["hit","hot","lot","log","cog"]]
+
+Example 2:
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
+Output: []
+Explanation: The endWord "cog" is not in wordList, therefore there is no valid transformation sequence.
+
+Constraints:
+- 1 <= beginWord.length <= 5
+- endWord.length == beginWord.length
+- 1 <= wordList.length <= 500
+- wordList[i].length == beginWord.length
+- wordList[i] consists of lowercase English letters.
+- beginWord != endWord
+- All the words in wordList are unique.
+
+APPROACH: BFS + DFS (Backtracking)
+----------------------------------
+This approach splits the problem into two distinct phases to handle the complexity efficiently.
+
+Phase 1: BFS (Breadth-First Search)
+- Goal: Find the shortest distance from `beginWord` to `endWord` AND build a directed graph (adjacency list).
+- This graph represents the "layers" of the BFS. We only add edges from `wordA` -> `wordB` if `wordB` is in the *next* level of the BFS hierarchy.
+- This ensures that when we traverse this graph later, we form ONLY shortest paths.
+- Why BFS? BFS is guaranteed to find shortest paths in an unweighted graph.
+
+Phase 2: DFS (Depth-First Search / Backtracking)
+- Goal: Reconstruct all paths from `beginWord` to `endWord` using the graph built in Phase 1.
+- We start at `beginWord` and recursively visit neighbors in our specific `adj` graph until we reach `endWord`.
+- Since our graph only contains "shortest path" edges, any path from start to end in this graph IS a shortest path.
+
+Key Optimization:
+- "A-Z" Replacement: Instead of comparing every word against every other word (O(N^2 * L)), we generate all possible neighbors by changing each letter to 'a'-'z' (O(26 * L * L)).
+  - Given N=500 and L=5:
+  - N^2 * L = 250,000 * 5 = 1,250,000 ops.
+  - N * 26 * L * L = 500 * 26 * 5 * 5 = 325,000 ops.
+  - For small L, the generation method is significantly faster.
+
+Time Complexity: O(N * 26 * L^2 + P * L)
+- BFS Graph Build: O(N * 26 * L^2), where N is number of words, L is word length.
+- DFS Reconstruction: O(P * L), where P is the number of shortest paths.
+- In worst case, P can be exponential, but constraints (N=500) limit this.
+
+Space Complexity: O(N * L + P * L)
+- Adjacency list stores up to N words.
+- Recursion stack for DFS.
+- Storing all paths.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-wordladderii" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: Word Ladder II
+DIFFICULTY: Hard
+TIME LIMIT: 50 Minutes
+
+VISUAL EXPLANATIONS:
+- TECH DOSE (BFS + DFS Explained): https://www.youtube.com/watch?v=mIZJIuMpI2M
+- Happy Coding (Detailed Walkthrough): https://www.youtube.com/watch?v=DREVt7pMtrA
+- Tushar Roy (Graph Construction): https://www.youtube.com/watch?v=PblfDYmlW87
+
+A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words 
+beginWord -> s1 -> s2 -> ... -> sk such that:
+1. Every adjacent pair of words differs by a single letter.
+2. Every si for 1 <= i <= k is in wordList. Note that beginWord does not need to be in wordList.
+3. sk == endWord
+
+Given two words, beginWord and endWord, and a dictionary wordList, return ALL the shortest transformation sequences 
+from beginWord to endWord, or an empty list if no such sequence exists.
+
+Example 1:
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+Output: [["hit","hot","dot","dog","cog"],["hit","hot","lot","log","cog"]]
+
+Example 2:
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
+Output: []
+Explanation: The endWord "cog" is not in wordList, therefore there is no valid transformation sequence.
+
+Constraints:
+- 1 <= beginWord.length <= 5
+- endWord.length == beginWord.length
+- 1 <= wordList.length <= 500
+- wordList[i].length == beginWord.length
+- wordList[i] consists of lowercase English letters.
+- beginWord != endWord
+- All the words in wordList are unique.
+
+APPROACH: BFS + DFS (Backtracking)
+----------------------------------
+This approach splits the problem into two distinct phases to handle the complexity efficiently.
+
+Phase 1: BFS (Breadth-First Search)
+- Goal: Find the shortest distance from `beginWord` to `endWord` AND build a directed graph (adjacency list).
+- This graph represents the "layers" of the BFS. We only add edges from `wordA` -> `wordB` if `wordB` is in the *next* level of the BFS hierarchy.
+- This ensures that when we traverse this graph later, we form ONLY shortest paths.
+- Why BFS? BFS is guaranteed to find shortest paths in an unweighted graph.
+
+Phase 2: DFS (Depth-First Search / Backtracking)
+- Goal: Reconstruct all paths from `beginWord` to `endWord` using the graph built in Phase 1.
+- We start at `beginWord` and recursively visit neighbors in our specific `adj` graph until we reach `endWord`.
+- Since our graph only contains "shortest path" edges, any path from start to end in this graph IS a shortest path.
+
+Key Optimization:
+- "A-Z" Replacement: Instead of comparing every word against every other word (O(N^2 * L)), we generate all possible neighbors by changing each letter to 'a'-'z' (O(26 * L * L)).
+  - Given N=500 and L=5:
+  - N^2 * L = 250,000 * 5 = 1,250,000 ops.
+  - N * 26 * L * L = 500 * 26 * 5 * 5 = 325,000 ops.
+  - For small L, the generation method is significantly faster.
+
+Time Complexity: O(N * 26 * L^2 + P * L)
+- BFS Graph Build: O(N * 26 * L^2), where N is number of words, L is word length.
+- DFS Reconstruction: O(P * L), where P is the number of shortest paths.
+- In worst case, P can be exponential, but constraints (N=500) limit this.
+
+Space Complexity: O(N * L + P * L)
+- Adjacency list stores up to N words.
+- Recursion stack for DFS.
+- Storing all paths.
+"""
+
+from typing import List
+from collections import deque, defaultdict
+
+class Solution:
+    def findLadders(self, beginWord: str, endWord: str, wordList: List[str]) -> List[List[str]]:
+        wordSet = set(wordList)
+        if endWord not in wordSet:
+            return []
+            
+        # BFS initialization
+        # layer: Stores words in the current level of BFS
+        layer = {beginWord}
+        # adj: Stores the directed graph of shortest paths: parent -> list of children
+        adj = defaultdict(list)
+        
+        while layer:
+            next_layer = set()
+            # Remove words in current layer from wordSet to prevent visiting them again in future layers
+            # This ensures we don't have cycles and only move forward.
+            # (Standard BFS usually marks visited immediately, but for *all* shortest paths, 
+            # we might visit the same node from multiple parents in the SAME layer, so we remove AFTER processing the layer).
+            for word in layer:
+                if word in wordSet:
+                    # [PITFALL] We remove words from wordSet only when we start processing the *next* layer, 
+                    # OR we can remove them immediately if we track "current level visited".
+                    # Better: remove all words in 'layer' from 'wordSet' at the start of the level processing
+                    # to prevent finding them again in future levels.
+                    # However, we must allow multiple parents in the CURRENT level to reach the same child in NEXT level.
+                    wordSet.remove(word)
+            
+            # Since we removed them, if 'dog' is reached from 'dot' and 'log', it's fine because 
+            # 'dog' is in the *next_layer* set, and we process 'dot' and 'log' in the *current* layer.
+            # Wait, correcting logic: We must remove words from wordSet that are in the *current* layer 
+            # so they aren't visited again. BUT multiple parents in current layer can point to same child.
+            # So correct logic: remove 'layer' words from 'wordSet' before processing?
+            # actually, standard is: remove all nodes in 'next_layer' from 'wordSet' *after* building next_layer.
+            # Let's stick to the level-by-level BFS.
+            
+            # Proper logic:
+            # 1. Identify all valid neighbors for all nodes in current layer.
+            # 2. Build adjacency list.
+            # 3. populate next_layer.
+            # 4. Remove next_layer words from unvisited set.
+            
+            # To handle the removal correctly:
+            # We remove words from wordSet *before* the loop? No. 
+            # We remove used words from the global set *after* finishing the current level.
+            
+            words_in_this_level_visited = set()
+            
+            for word in layer:
+                # Try changing each character to find neighbors
+                for i in range(len(word)):
+                    original_char = word[i]
+                    for char_code in range(ord('a'), ord('z') + 1):
+                        c = chr(char_code)
+                        if c == original_char:
+                            continue
+                            
+                        new_word = word[:i] + c + word[i+1:]
+                        if new_word in wordSet:
+                            if new_word not in words_in_this_level_visited:
+                                next_layer.add(new_word)
+                                words_in_this_level_visited.add(new_word)
+                            
+                            # Add edge parent -> child
+                            adj[word].append(new_word)
+                            
+            # If we found endWord in this level, we are done building the graph
+            if endWord in next_layer:
+                break
+                
+            # Prepare for next iteration
+            layer = next_layer
+            # Remove visited words from global set so we don't go back to them
+            wordSet -= next_layer
+            
+        # DFS Reconstruction
+        res = []
+        path = [beginWord]
+        
+        def backtrack(current_word):
+            if current_word == endWord:
+                res.append(list(path))
+                return
+            
+            for neighbor in adj[current_word]:
+                path.append(neighbor)
+                backtrack(neighbor)
+                path.pop()
+                
+        backtrack(beginWord)
+        
+        # NOTE: The problem asks for shortest paths.
+        # If BFS finished without finding endWord, res will be empty, which is correct.
+        # However, due to the break condition, we might have partial paths if endWord wasn't found.
+        # But if endWord wasn't in next_layer, we continued.
+        # If loop finished and we didn't hit 'break', res will be empty.
+        
+        return res
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1
+    beginWord = "hit"
+    endWord = "cog"
+    wordList = ["hot","dot","dog","lot","log","cog"]
+    print(f"Test 1 Output: {solver.findLadders(beginWord, endWord, wordList)}")
+    # Expected: [["hit","hot","dot","dog","cog"],["hit","hot","lot","log","cog"]]
+    
+    # Test 2
+    beginWord = "hit"
+    endWord = "cog"
+    wordList = ["hot","dot","dog","lot","log"]
+    print(f"Test 2 Output: {solver.findLadders(beginWord, endWord, wordList)}")
+    # Expected: []
+</code></pre>
+                </div>
+            </div>
+            
+            <div id="prob-aliendictionary" class="problem-block">
+                <div class="problem-header">
+                    <h2>Alien Dictionary</h2>
+                    <span class="badge">_05_alien_dictionary.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-aliendictionary')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-aliendictionary')">Code</button>
+                    <a href="https://www.google.com/search?q=Alien Dictionary+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-aliendictionary" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Alien Dictionary
+DIFFICULTY: Hard
+TIME LIMIT: 35 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (DFS & BFS): https://www.youtube.com/watch?v=6kTZYvNNyps
+- Take U Forward (Kahn's Algorithm): https://www.youtube.com/watch?v=U3N_je7tWAs
+- Tech Dose (Topological Sort): https://www.youtube.com/watch?v=RIrTuf4DfYE
+
+There is a new alien language that uses the English alphabet. However, the order among the letters is unknown to you.
+
+You are given a list of strings `words` from the alien language's dictionary, where the strings in `words` 
+are sorted lexicographically by the rules of this new language.
+
+Return a string of the unique letters in the new alien language sorted in lexicographically increasing order 
+by the new language's rules. If there is no solution, return "". If there are multiple solutions, return any of them.
+
+Example 1:
+Input: words = ["wrt","wrf","er","ett","rftt"]
+Output: "wertf"
+
+Example 2:
+Input: words = ["z","x"]
+Output: "zx"
+
+Example 3:
+Input: words = ["z","x","z"]
+Output: ""
+Explanation: The order is invalid, so return "".
+
+Constraints:
+- 1 <= words.length <= 100
+- 1 <= words[i].length <= 100
+- words[i] consists of only lowercase English letters.
+
+APPROACH: Topological Sort (Kahn's Algorithm or DFS)
+---------------------------------------------------
+This is a classic graph problem. The precedence rules (character 'a' comes before 'b') form a Directed Acyclic Graph (DAG).
+We need to find a linear ordering of nodes such that for every directed edge from u to v, node u comes before v in the ordering. This is exactly what **Topological Sorting** does.
+
+Algorithm (Kahn's Algorithm - BFS):
+1. **Build the Graph**:
+   - Create an adjacency list `adj` where `adj[u]` contains all characters `v` that come *immediately after* `u`.
+   - Compute `in_degree` for every unique character. `in_degree[v]` is the number of characters that must precede `v`.
+   - Iterate through adjacent words in the input list. The FIRST differing character determines the order.
+     - E.g., "wrt" vs "wrf" -> 't' comes before 'f'. Add edge t->f.
+     - **Edge Case**: If "abc" comes before "ab", this is invalid in any dictionary (prefix must suffice). Return "".
+
+2. **Initialize Queue**:
+   - Add all nodes with `in_degree == 0` to a queue. These are characters with no prerequisites.
+
+3. **Process Queue (BFS)**:
+   - While queue is not empty:
+     - Pop `u`. Add `u` to result.
+     - For each neighbor `v` of `u`:
+       - Decrement `in_degree[v]`.
+       - If `in_degree[v]` becomes 0, push `v` to queue.
+
+4. **Cycle Detection**:
+   - If the result contains fewer characters than the total unique characters, it means there is a cycle (dependency loop like a < b < a). Return "".
+
+Time Complexity: O(C)
+- C is the total length of all words in the input list.
+- We iterate through all words to build the graph (O(C)).
+- V is number of unique characters (at most 26), E is edges (at most 26^2).
+- Topo sort takes O(V + E). Since V and E are small constants, O(C) dominates.
+
+Space Complexity: O(1) or O(U + min(U^2, N))
+- We store the graph and degrees for U unique characters (at most 26).
+- So O(1) effectively since alphabet size is fixed.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-aliendictionary" class="tab-content">
+                    <pre><code class="language-python">
+"""
+PROBLEM: Alien Dictionary
+DIFFICULTY: Hard
+TIME LIMIT: 35 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (DFS & BFS): https://www.youtube.com/watch?v=6kTZYvNNyps
+- Take U Forward (Kahn's Algorithm): https://www.youtube.com/watch?v=U3N_je7tWAs
+- Tech Dose (Topological Sort): https://www.youtube.com/watch?v=RIrTuf4DfYE
+
+There is a new alien language that uses the English alphabet. However, the order among the letters is unknown to you.
+
+You are given a list of strings `words` from the alien language's dictionary, where the strings in `words` 
+are sorted lexicographically by the rules of this new language.
+
+Return a string of the unique letters in the new alien language sorted in lexicographically increasing order 
+by the new language's rules. If there is no solution, return "". If there are multiple solutions, return any of them.
+
+Example 1:
+Input: words = ["wrt","wrf","er","ett","rftt"]
+Output: "wertf"
+
+Example 2:
+Input: words = ["z","x"]
+Output: "zx"
+
+Example 3:
+Input: words = ["z","x","z"]
+Output: ""
+Explanation: The order is invalid, so return "".
+
+Constraints:
+- 1 <= words.length <= 100
+- 1 <= words[i].length <= 100
+- words[i] consists of only lowercase English letters.
+
+APPROACH: Topological Sort (Kahn's Algorithm or DFS)
+---------------------------------------------------
+This is a classic graph problem. The precedence rules (character 'a' comes before 'b') form a Directed Acyclic Graph (DAG).
+We need to find a linear ordering of nodes such that for every directed edge from u to v, node u comes before v in the ordering. This is exactly what **Topological Sorting** does.
+
+Algorithm (Kahn's Algorithm - BFS):
+1. **Build the Graph**:
+   - Create an adjacency list `adj` where `adj[u]` contains all characters `v` that come *immediately after* `u`.
+   - Compute `in_degree` for every unique character. `in_degree[v]` is the number of characters that must precede `v`.
+   - Iterate through adjacent words in the input list. The FIRST differing character determines the order.
+     - E.g., "wrt" vs "wrf" -> 't' comes before 'f'. Add edge t->f.
+     - **Edge Case**: If "abc" comes before "ab", this is invalid in any dictionary (prefix must suffice). Return "".
+
+2. **Initialize Queue**:
+   - Add all nodes with `in_degree == 0` to a queue. These are characters with no prerequisites.
+
+3. **Process Queue (BFS)**:
+   - While queue is not empty:
+     - Pop `u`. Add `u` to result.
+     - For each neighbor `v` of `u`:
+       - Decrement `in_degree[v]`.
+       - If `in_degree[v]` becomes 0, push `v` to queue.
+
+4. **Cycle Detection**:
+   - If the result contains fewer characters than the total unique characters, it means there is a cycle (dependency loop like a < b < a). Return "".
+
+Time Complexity: O(C)
+- C is the total length of all words in the input list.
+- We iterate through all words to build the graph (O(C)).
+- V is number of unique characters (at most 26), E is edges (at most 26^2).
+- Topo sort takes O(V + E). Since V and E are small constants, O(C) dominates.
+
+Space Complexity: O(1) or O(U + min(U^2, N))
+- We store the graph and degrees for U unique characters (at most 26).
+- So O(1) effectively since alphabet size is fixed.
+"""
+
+from typing import List
+
+class Solution:
+    def alienOrder(self, words: List[str]) -> str:
+        # Step 0: Create data structures
+        # Adjacency list: Initialize a adjacency list initially with just all the unique characters found in the words
+        # Eventually we will Map each character to a set of characters that come AFTER it.
+        adj = {c: set() for w in words for c in w}
+
+
+        # In-degree count: Initialize a in-degree count initially with just all the unique characters found in the words
+        # Eventually we will Map each character to the number of characters that come BEFORE it.
+        in_degree = {c: 0 for c in adj}
+
+        # Step 1: Build the Graph
+        # We iterate through the sorted list of words and compare adjacent pairs.
+        for i in range(len(words) - 1):
+            w1, w2 = words[i], words[i+1]
+            min_len = min(len(w1), len(w2))
+            
+            # Edge Case: Prefix Order Verification
+            # If w2 is a prefix of w1 (e.g., ["apple", "app"]), this is invalid.
+            # In a dictionary, the shorter prefix ("app") must always come BEFORE the longer word ("apple").
+            if len(w1) > len(w2) and w1[:min_len] == w2[:min_len]:
+                # [PITFALL] Edge Case: "abc" before "ab" is invalid in a dictionary.
+                # If the longer word is first, and it's a prefix of the later word, order is impossible.
+                return ""
+            
+            # Find the first character difference to determine relative order.
+            for j in range(min_len):
+                if w1[j] != w2[j]:
+                    char_out = w1[j]  # The character that comes first (source)
+                    char_in = w2[j]   # The character that comes after (destination)
+                    
+                    # Add edge: char_out -> char_in
+                    # This means char_out must come before char_in.
+                    # We only add the edge if it doesn't already exist to avoid redundant processing.
+                    if char_in not in adj[char_out]:
+                        adj[char_out].add(char_in)
+                        in_degree[char_in] += 1
+                    
+                    # CRITICAL: We only care about the FIRST difference.
+                    # Subsequent characters do NOT imply order because the words are already sorted by this index.
+                    break
+
+        # Step 2: Kahn's Algorithm (Topological Sort via BFS)
+        # Initialize queue with all characters that have NO incoming edges (in_degree == 0).
+        # These characters can be the start of our alien alphabet.
+        from collections import deque
+        queue = deque([c for c in in_degree if in_degree[c] == 0])
+        result = []
+        
+        while queue:
+            char = queue.popleft()
+            result.append(char)
+            
+            # "Remove" this character from the graph:
+            # For each neighbor, decrement its in-degree since its prerequisite (char) is processed.
+            for neighbor in adj[char]:
+                in_degree[neighbor] -= 1
+                # If a neighbor now has 0 incoming edges, it's free to be added to the queue.
+                if in_degree[neighbor] == 0:
+                    queue.append(neighbor)
+        
+        # Step 3: Cycle Detection
+        # If the result length is less than the total unique characters, it means there was a cycle.
+        # Characters in a cycle (e.g., a->b->a) never reach in_degree == 0, so they are never added to result.
+        if len(result) < len(in_degree):
+            # [PITFALL] Cycle Detection.
+            # If the result contains fewer characters than the total unique characters, 
+            # it means some nodes were never added to the queue (incoming edges never became 0).
+            # This implies a cycle exists (e.g., a < b < a).
+            return ""
+            
+        return "".join(result)
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1
+    words1 = ["wrt","wrf","er","ett","rftt"]
+    # Possible valid outputs: "wertf"
+    print(f"Test 1: {solver.alienOrder(words1)}")
+    
+    # Test 2
+    words2 = ["z","x"]
+    print(f"Test 2: {solver.alienOrder(words2)}")
+    
+    # Test 3 (Invalid)
+    words3 = ["z","x","z"]
+    print(f"Test 3: {solver.alienOrder(words3)}")
+</code></pre>
+                </div>
+            </div>
+            
+            <div id="prob-removeinvalidparentheses" class="problem-block">
+                <div class="problem-header">
+                    <h2>Remove Invalid Parentheses</h2>
+                    <span class="badge">_12_remove_invalid_parentheses.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-removeinvalidparentheses')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-removeinvalidparentheses')">Code</button>
+                    <a href="https://www.google.com/search?q=Remove Invalid Parentheses+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-removeinvalidparentheses" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Remove Invalid Parentheses
+DIFFICULTY: Hard
+TIME LIMIT: 50 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (BFS): https://www.youtube.com/watch?v=3eU0MAus0h8
+- Tech Dose (Backtracking & BFS): https://www.youtube.com/watch?v=CbdoEz5peTE
+- HappyGirlZT (Explanation): https://www.youtube.com/watch?v=2k_27C-P7Kg
+
+Given a string s that contains parentheses and letters, remove the minimum number of invalid parentheses to make the input string valid.
+
+Return a list of unique strings that are valid with the minimum number of removals. You may return the answer in any order.
+
+Example 1:
+Input: s = "()())()"
+Output: ["(())()","()()()"]
+
+Example 2:
+Input: s = "(a)())()"
+Output: ["(a())()","(a)()()"]
+
+Example 3:
+Input: s = ")("
+Output: [""]
+
+Constraints:
+- 1 <= s.length <= 25
+- s consists of lowercase English letters and parentheses '(' and ')'.
+- There will be at most 20 parentheses in s.
+
+APPROACH: Breadth-First Search (BFS)
+------------------------------------
+We are asked for the **minimum** number of removals.
+This suggests a shortest-path problem on a graph where:
+- Each node is a string state.
+- Each edge is the removal of ONE parenthesis.
+- The starting node is the input string `s`.
+- The target nodes are any valid strings.
+
+Algorithm:
+1. Initialize a `queue` with the set {s} (using a set avoids duplicate states in the same level).
+2. Initialize a `visited` set to track all processed strings.
+3. While queue is not empty:
+   - Check if any string in the current level is Valid.
+     - If yes, filter ALL valid strings in this level and return them. (Because BFS guarantees minimal removals, the first level with solutions is the optimal level).
+   - If no valid strings found in this level, generate the NEXT level:
+     - For each string in current level:
+       - Try removing valid characters (only '(' or ')') one by one.
+       - Add resulting string to next level set if not visited.
+   - Update `visited` with the items in the queue.
+   - Move to next level.
+
+Optimization:
+- Using sets for levels automatically handles duplicates (e.g., removing different '(' might result in same string).
+- We prune the search as soon as we find the first valid layer.
+
+Industry Nomenclature:
+- **BFS (Breadth-First Search)**: Algorithm for traversing tree or graph structures level by level.
+- **State Space Search**: Exploring all possible configurations to find a goal state.
+- **Pruning**: We prune the search as soon as we find the first valid layer.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-removeinvalidparentheses" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: Remove Invalid Parentheses
+DIFFICULTY: Hard
+TIME LIMIT: 50 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (BFS): https://www.youtube.com/watch?v=3eU0MAus0h8
+- Tech Dose (Backtracking & BFS): https://www.youtube.com/watch?v=CbdoEz5peTE
+- HappyGirlZT (Explanation): https://www.youtube.com/watch?v=2k_27C-P7Kg
+
+Given a string s that contains parentheses and letters, remove the minimum number of invalid parentheses to make the input string valid.
+
+Return a list of unique strings that are valid with the minimum number of removals. You may return the answer in any order.
+
+Example 1:
+Input: s = "()())()"
+Output: ["(())()","()()()"]
+
+Example 2:
+Input: s = "(a)())()"
+Output: ["(a())()","(a)()()"]
+
+Example 3:
+Input: s = ")("
+Output: [""]
+
+Constraints:
+- 1 <= s.length <= 25
+- s consists of lowercase English letters and parentheses '(' and ')'.
+- There will be at most 20 parentheses in s.
+
+APPROACH: Breadth-First Search (BFS)
+------------------------------------
+We are asked for the **minimum** number of removals.
+This suggests a shortest-path problem on a graph where:
+- Each node is a string state.
+- Each edge is the removal of ONE parenthesis.
+- The starting node is the input string `s`.
+- The target nodes are any valid strings.
+
+Algorithm:
+1. Initialize a `queue` with the set {s} (using a set avoids duplicate states in the same level).
+2. Initialize a `visited` set to track all processed strings.
+3. While queue is not empty:
+   - Check if any string in the current level is Valid.
+     - If yes, filter ALL valid strings in this level and return them. (Because BFS guarantees minimal removals, the first level with solutions is the optimal level).
+   - If no valid strings found in this level, generate the NEXT level:
+     - For each string in current level:
+       - Try removing valid characters (only '(' or ')') one by one.
+       - Add resulting string to next level set if not visited.
+   - Update `visited` with the items in the queue.
+   - Move to next level.
+
+Optimization:
+- Using sets for levels automatically handles duplicates (e.g., removing different '(' might result in same string).
+- We prune the search as soon as we find the first valid layer.
+
+Industry Nomenclature:
+- **BFS (Breadth-First Search)**: Algorithm for traversing tree or graph structures level by level.
+- **State Space Search**: Exploring all possible configurations to find a goal state.
+- **Pruning**: We prune the search as soon as we find the first valid layer.
+"""
+
+from typing import List
+from collections import deque
+
+class Solution:
+    def removeInvalidParentheses(self, s: str) -> List[str]:
+        def isValid(string):
+            count = 0
+            for char in string:
+                if char == '(':
+                    count += 1
+                elif char == ')':
+                    count -= 1
+                
+                # If count goes negative, we have a closing parenthesis without a matching open one.
+                if count < 0:
+                    return False
+            return count == 0
+
+        # Queue for BFS and visited set
+        queue = deque([s])
+        visited = {s}
+        found = False
+        res = []
+
+        while queue:
+            # We process level by level
+            # In Python, we can just process the queue as is, but we need to know when a level ends
+            # to stop if we found a solution.
+            
+            # Since 'queue' changes size as we append, we snapshot current string count?
+            # Or simpler:
+            #   If we find a valid string in the *current* extracted item, 
+            #   we know that *this level* is the target level.
+            #   So we set 'found = True'. We continue to process the rest of the queue items 
+            #   (which are at the same level) to find ALL solutions, but we DO NOT add their children to queue.
+            
+            curr = queue.popleft()
+            
+            if isValid(curr):
+                res.append(curr)
+                found = True
+            
+            # If we already found a valid string at this level (or previous processed node in same level),
+            # we should NOT generate further children (next level would be n+1 removals).
+            if found:
+                continue
+            
+            # Generate next states
+            for i in range(len(curr)):
+                # We only remove parentheses
+                if curr[i] not in ('(', ')'):
+                    continue
+                
+                # Create optimization: Skip duplicates in the generated string
+                # e.g. "((...)" -> removing first '(' vs second '(' might result in same string if adjacent.
+                # Actually, duplicate strings are handled by `visited` set, so we don't need complex skipping logic here.
+                
+                next_str = curr[:i] + curr[i+1:]
+                
+                if next_str not in visited:
+                    visited.add(next_str)
+                    queue.append(next_str)
+            
+            # CRITICAL LOOP FIX:
+            # The standard BFS loop above has a bug.
+            # If queue has [A, B] (level 1).
+            # We pop A. Invalid. We push A's children (Level 2). Queue is now [B, A_child1...].
+            # We pop B. Valid! found=True.
+            # But we already pushed A's children (Level 2) into the queue.
+            # We will process B, find it is valid. Then next iteration we pop A_child1. 
+            # `found` is True, so we don't generate children for A_child1, but A_child1 is definitely NOT minimal if B was valid (Level 1 vs Level 2).
+            #
+            # CORRECTION: We must process the ENTIRE level before moving to the next level.
+        
+        # Correct BFS Implementation using explicit levels
+        queue = {s} # Use a set for the current level to automatically handle duplicates
+        visited = set()
+        
+        while queue:
+            # Check validity of all strings in this level
+            valid_strings = [x for x in queue if isValid(x)]
+            
+            if valid_strings:
+                # [PITFALL] Return immediately after the first valid level.
+                # Since BFS guarantees shortest path (minimum removals),
+                # the first level that contains ANY valid string contains ALL optimal solutions.
+                return valid_strings
+            
+            # If no valid strings found, generate next level
+            next_level = set()
+            for curr in queue:
+                for i in range(len(curr)):
+                    if curr[i] in ('(', ')'):
+                        next_str = curr[:i] + curr[i+1:]
+                        if next_str not in visited:
+                            next_level.add(next_str)
+                            # visited.add(next_str) # Defer adding to visited until next level start? 
+                            # Actually, efficient to just track global visited
+            
+            # Update visited
+            visited.update(queue)
+            queue = next_level
+            
+        return [""]
+
+# Test Cases
+if __name__ == "__main__":
+    solver = Solution()
+    
+    # Test 1
+    s1 = "()())()"
+    print(f"Test 1: {solver.removeInvalidParentheses(s1)} (Expected: ['(())()', '()()()'])")
+    
+    # Test 2
+    s2 = "(a)())()"
+    print(f"Test 2: {solver.removeInvalidParentheses(s2)} (Expected: ['(a())()', '(a)()()'])")
+    
+    # Test 3
+    s3 = ")("
+    print(f"Test 3: {solver.removeInvalidParentheses(s3)} (Expected: [''])")
+</code></pre>
+                </div>
+            </div>
+            </div>
+        <div id="pattern-5planningsystemdesignbridges" class="pattern-section">
+            <h1 class="gradient-text">5. Planning (System Design Bridges)</h1>
+            <div class="card mnemonic-card">
+                <p><strong>Analogy:</strong> � **The Supermarket Manager**.</p>
+                <p class="highlight"><strong>Mnemonic:</strong> "Dictionary & Desk."</p>
+            </div>
+        
+            <div id="prob-lrucache" class="problem-block">
+                <div class="problem-header">
+                    <h2>LRU Cache</h2>
+                    <span class="badge">_15_lru_cache.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-lrucache')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-lrucache')">Code</button>
+                    <a href="https://www.google.com/search?q=LRU Cache+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-lrucache" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: LRU Cache
+DIFFICULTY: Medium (But Expected to be implemented cleanly in Hard Interviews)
+TIME LIMIT: 30 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Hash Map + Double Linked List): https://www.youtube.com/watch?v=7V856LH8fqE
+- Tech Dose (Explained): https://www.youtube.com/watch?v=xDEuM5qa0zg
+- Google Engineer Explains: https://www.youtube.com/watch?v=NDpwj0VWz1U
+
+Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.
+
+Implement the `LRUCache` class:
+- `LRUCache(int capacity)` Initialize the LRU cache with positive size capacity.
+- `int get(int key)` Return the value of the key if the key exists, otherwise return -1.
+- `void put(int key, int value)` Update the value of the key if the key exists. Otherwise, add the key-value pair to the cache. 
+  If the number of keys exceeds the capacity from this operation, evict the least recently used key.
+
+The functions `get` and `put` must each run in O(1) average time complexity.
+
+Example 1:
+Input:
+["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"]
+[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]
+Output:
+[null, null, null, 1, null, -1, null, -1, 3, 4]
+
+Constraints:
+- 1 <= capacity <= 3000
+- 0 <= key <= 10^4
+- 0 <= value <= 10^5
+- At most 2 * 10^5 calls will be made to get and put.
+
+APPROACH: Hash Map + Doubly Linked List
+---------------------------------------
+To achieve O(1) for both `get` and `put`, we need two data structures working together:
+1. **Hash Map (Dictionary)**: 
+   - Maps `key` -> `Node`.
+   - Allows O(1) access to a node given its key.
+2. **Doubly Linked List**:
+   - Maintains the order of elements based on usage (Most Recently Used at one end, Least Recently Used at the other).
+   - Allows O(1) removal and insertion of nodes (unlike an array which is O(N)).
+
+Logic:
+- When we access a node (`get` or `put` existing), we move it to the "Most Recently Used" (MRU) position (usually the head/right end).
+- When we insert a new node (`put` new), we add it to the MRU position.
+- If we exceed capacity, we remove the node at the "Least Recently Used" (LRU) position (usually the tail/left end) and delete it from the Hash Map.
+
+Why Doubly Linked List?
+- We need to remove a node from the middle of the list (when `get` is called) and move it to the front. 
+- With a singly linked list, we can't delete a node in O(1) without having a reference to its *previous* node.
+- With a doubly linked list, each node has `prev` and `next`, so we can delete it directly.
+
+Industry Nomenclature:
+- **Eviction Policy**: The algorithm used to decide which item to discard (LRU, LFU, FIFO).
+- **Sentinel Nodes / Dummy Nodes**: Nodes at the head and tail that act as guards to simplify edge cases (empty list, single element list).</pre>
+                    </div>
+                </div>
+                
+                <div id="code-lrucache" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: LRU Cache
+DIFFICULTY: Medium (But Expected to be implemented cleanly in Hard Interviews)
+TIME LIMIT: 30 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Hash Map + Double Linked List): https://www.youtube.com/watch?v=7V856LH8fqE
+- Tech Dose (Explained): https://www.youtube.com/watch?v=xDEuM5qa0zg
+- Google Engineer Explains: https://www.youtube.com/watch?v=NDpwj0VWz1U
+
+Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.
+
+Implement the `LRUCache` class:
+- `LRUCache(int capacity)` Initialize the LRU cache with positive size capacity.
+- `int get(int key)` Return the value of the key if the key exists, otherwise return -1.
+- `void put(int key, int value)` Update the value of the key if the key exists. Otherwise, add the key-value pair to the cache. 
+  If the number of keys exceeds the capacity from this operation, evict the least recently used key.
+
+The functions `get` and `put` must each run in O(1) average time complexity.
+
+Example 1:
+Input:
+["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"]
+[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]
+Output:
+[null, null, null, 1, null, -1, null, -1, 3, 4]
+
+Constraints:
+- 1 <= capacity <= 3000
+- 0 <= key <= 10^4
+- 0 <= value <= 10^5
+- At most 2 * 10^5 calls will be made to get and put.
+
+APPROACH: Hash Map + Doubly Linked List
+---------------------------------------
+To achieve O(1) for both `get` and `put`, we need two data structures working together:
+1. **Hash Map (Dictionary)**: 
+   - Maps `key` -> `Node`.
+   - Allows O(1) access to a node given its key.
+2. **Doubly Linked List**:
+   - Maintains the order of elements based on usage (Most Recently Used at one end, Least Recently Used at the other).
+   - Allows O(1) removal and insertion of nodes (unlike an array which is O(N)).
+
+Logic:
+- When we access a node (`get` or `put` existing), we move it to the "Most Recently Used" (MRU) position (usually the head/right end).
+- When we insert a new node (`put` new), we add it to the MRU position.
+- If we exceed capacity, we remove the node at the "Least Recently Used" (LRU) position (usually the tail/left end) and delete it from the Hash Map.
+
+Why Doubly Linked List?
+- We need to remove a node from the middle of the list (when `get` is called) and move it to the front. 
+- With a singly linked list, we can't delete a node in O(1) without having a reference to its *previous* node.
+- With a doubly linked list, each node has `prev` and `next`, so we can delete it directly.
+
+Industry Nomenclature:
+- **Eviction Policy**: The algorithm used to decide which item to discard (LRU, LFU, FIFO).
+- **Sentinel Nodes / Dummy Nodes**: Nodes at the head and tail that act as guards to simplify edge cases (empty list, single element list).
+"""
+
+class DNode:
+    """Doubly Linked List Node"""
+    def __init__(self, key=0, value=0):
+        self.key = key
+        self.value = value
+        self.prev = None
+        self.next = None
+
+class LRUCache:
+
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.cache = {} # Map key -> DNode
+        
+        # Initialize dummy head and tail nodes
+        # Head -> LRU (Least Recently Used)
+        # Tail -> MRU (Most Recently Used)
+        # Or vice versa. Let's strictly define:
+        # Head.next is the FIRST node (LRU).
+        # Tail.prev is the LAST node (MRU).
+        self.head = DNode()
+        self.tail = DNode()
+        
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+    def _remove(self, node: DNode):
+        """Removes a node from the linked list."""
+        prev_node = node.prev
+        next_node = node.next
+        
+        prev_node.next = next_node
+        next_node.prev = prev_node
+
+    def _add(self, node: DNode):
+        """Adds a node right before the tail (MRU position)."""
+        prev_node = self.tail.prev
+        
+        prev_node.next = node
+        node.prev = prev_node
+        node.next = self.tail
+        self.tail.prev = node
+
+    def get(self, key: int) -> int:
+        if key in self.cache:
+            node = self.cache[key]
+            # Move accessed node to MRU (remove then add to end)
+            self._remove(node)
+            self._add(node)
+            return node.value
+        return -1
+
+    def put(self, key: int, value: int) -> None:
+        if key in self.cache:
+            # Update value and move to MRU
+            # [PITFALL] Update Existing Key.
+            # Two steps: 
+            # 1. Update the value.
+            # 2. Move to MRU (remove and re-add).
+            # Common mistake: forgetting to move to MRU on update, or forgetting to update value.
+            node = self.cache[key]
+            self._remove(node)
+            node.value = value
+            self._add(node)
+        else:
+            # Create new node
+            new_node = DNode(key, value)
+            self.cache[key] = new_node
+            self._add(new_node)
+            
+            # Check capacity
+            if len(self.cache) > self.capacity:
+                # Evict LRU (node after head)
+                lru_node = self.head.next
+                self._remove(lru_node)
+                del self.cache[lru_node.key]
+
+# Test Cases
+if __name__ == "__main__":
+    # Test 1
+    lru = LRUCache(2)
+    lru.put(1, 1) # Cache: {1=1}
+    lru.put(2, 2) # Cache: {1=1, 2=2}
+    print(f"Get 1: {lru.get(1)} (Expected 1)") # Cache: {2=2, 1=1} (1 is MRU)
+    
+    lru.put(3, 3) # Evicts key 2. Cache: {1=1, 3=3}
+    print(f"Get 2: {lru.get(2)} (Expected -1)") 
+    
+    lru.put(4, 4) # Evicts key 1. Cache: {3=3, 4=4}
+    print(f"Get 1: {lru.get(1)} (Expected -1)")
+    print(f"Get 3: {lru.get(3)} (Expected 3)")
+    print(f"Get 4: {lru.get(4)} (Expected 4)")
+</code></pre>
+                </div>
+            </div>
+            
+            <div id="prob-designsearchautocompletesystem" class="problem-block">
+                <div class="problem-header">
+                    <h2>Design Search Autocomplete System</h2>
+                    <span class="badge">_16_design_search_autocomplete_system.py</span>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'expl-designsearchautocompletesystem')">Explanation</button>
+                    <button class="tab-btn" onclick="openTab(event, 'code-designsearchautocompletesystem')">Code</button>
+                    <a href="https://www.google.com/search?q=Design Search Autocomplete System+leetcode" target="_blank" class="ext-link">LeetCode ↗</a>
+                </div>
+                
+                <div id="expl-designsearchautocompletesystem" class="tab-content active">
+                    <div class="explanation-text">
+                        <pre>PROBLEM: Design Search Autocomplete System
+DIFFICULTY: Hard
+TIME LIMIT: 50 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Trie + Heap): https://www.youtube.com/watch?v=D4T2N0yAr20
+- Happy Girl ZT (Explanation): https://www.youtube.com/watch?v=PbZ51tE5Nls
+- Knowledge Center (Design): https://www.youtube.com/watch?v=nx1qceR0WjE
+
+Design a search autocomplete system for a search engine. Users may input a sentence (at least one word and end with a special character '#'). 
+For each character they type except '#', you need to return the top 3 historical hot sentences that have prefix the same as the part of sentence already typed. 
+Here are the specific rules:
+
+1. The hot degree for a sentence is defined as the number of times a user typed this exact sentence before.
+2. The returned top 3 hot sentences should be sorted by hot degree (The first is the hottest one). 
+   If several sentences have the same degree of hotness, you need to use ASCII-code order (smaller one appears first).
+3. If less than 3 hot sentences exist, return as many as you can.
+4. When the input is a special character, it means the sentence ends, and in this case, you need to return an empty list.
+5. Your job is to implement the following functions:
+
+The constructor function:
+`AutocompleteSystem(String[] sentences, int[] times)`: This is the constructor. The input is historical data. 
+`sentences` is a string array consists of previously typed sentences. `times` is the corresponding times a sentence has been typed. 
+Your system should record these historical data.
+
+`List<String> input(char c)`: The input c is the next character typed by the user. 
+The character will only be lower-case letters ('a' to 'z'), blank space (' '), or a special character ('#'). 
+Also, the previously typed sentence should be recorded in your system. 
+The output will be the top 3 historical hot sentences that have prefix the same as the part of sentence already typed.
+
+Example:
+Operation: AutocompleteSystem(["i love you", "island", "ironman", "i love leetcode"], [5, 3, 2, 2])
+The system have these sentences with the following times:
+"i love you" : 5 times
+"island" : 3 times
+"ironman" : 2 times
+"i love leetcode" : 2 times
+
+Now, the user begins another search:
+
+Operation: input('i')
+Output: ["i love you", "island", "i love leetcode"]
+Explanation:
+There are four sentences that have prefix "i". Among them, "ironman" and "i love leetcode" have same hot degree. 
+Since ' ' has ASCII code 32 and 'r' has ASCII code 114, "i love leetcode" should be in front of "ironman". 
+Also we only need to output top 3 hot sentences, so "ironman" will be ignored.
+
+Operation: input(' ')
+Output: ["i love you", "i love leetcode"]
+Explanation:
+There are only two sentences that have prefix "i ".
+
+Operation: input('a')
+Output: []
+Explanation:
+There are no sentences that have prefix "i a".
+
+Operation: input('#')
+Output: []
+Explanation:
+The user finished the input, the sentence "i a" should be saved as a historical sentence in system. 
+And the following input will be counted as a new search.
+
+Constraints:
+- The string sentences[i] consists of lowercase English letters and spaces.
+- 1 <= sentences.length <= 100
+- 1 <= sentences[i].length <= 100
+- 1 <= times[i] <= 50
+- c is a lowercase English letter, a space ' ', or '#'.
+- At most 5000 calls will be made to input.
+
+APPROACH: Trie with Cached Hot List (or On-the-fly Search)
+----------------------------------------------------------
+Since we need prefix matches, a **Trie** is the standard choice.
+
+Data Structures:
+1. **TrieNode**: 
+   - `children`: Dict[char, TrieNode]
+   - `sentences`: Dictionary `{sentence: count}` for ALL sentences that pass through this node (i.e., this node is a prefix of them).
+
+Algorithm:
+1. **Initialization**: Build the Trie. For each sentence, traverse the Trie. At *every* node along the path, update the `sentences` dictionary with the sentence's count.
+   (Why store at every node? So that when we are at that node during input, we have immediate access to all valid sentences and their counts to sort them).
+   
+2. **Input(c)**:
+   - If `#`: This marks the end of a sentence.
+     - Update the Trie with the new full sentence.
+     - Increment its count in the `sentences` map of every node along its path.
+     - Reset current tracking.
+     - Return empty list.
+   - If char:
+     - Move to child node.
+     - If no child exists, current prefix has no matches. Return [].
+     - If child exists, retrieve all sentences from `child.sentences`.
+     - **Sort** the sentences:
+       - Primary Key: Frequency (Descending) -> Use `-freq`.
+       - Secondary Key: ASCII string order (Ascending) -> Use `sentence`.
+     - Return Top 3.
+
+Optimization Note:
+- Storing the full dictionary of sentences at every node consumes memory. 
+- A more optimized "System Design" approach would be to store only the *Top 3* at each node.
+- However, given the constraints (N=100 sentences, length=100), storing the full map is feasible and easier to implement correctly in an interview context.</pre>
+                    </div>
+                </div>
+                
+                <div id="code-designsearchautocompletesystem" class="tab-content">
+                    <pre><code class="language-python">"""
+PROBLEM: Design Search Autocomplete System
+DIFFICULTY: Hard
+TIME LIMIT: 50 Minutes
+
+VISUAL EXPLANATIONS:
+- NeetCode (Trie + Heap): https://www.youtube.com/watch?v=D4T2N0yAr20
+- Happy Girl ZT (Explanation): https://www.youtube.com/watch?v=PbZ51tE5Nls
+- Knowledge Center (Design): https://www.youtube.com/watch?v=nx1qceR0WjE
+
+Design a search autocomplete system for a search engine. Users may input a sentence (at least one word and end with a special character '#'). 
+For each character they type except '#', you need to return the top 3 historical hot sentences that have prefix the same as the part of sentence already typed. 
+Here are the specific rules:
+
+1. The hot degree for a sentence is defined as the number of times a user typed this exact sentence before.
+2. The returned top 3 hot sentences should be sorted by hot degree (The first is the hottest one). 
+   If several sentences have the same degree of hotness, you need to use ASCII-code order (smaller one appears first).
+3. If less than 3 hot sentences exist, return as many as you can.
+4. When the input is a special character, it means the sentence ends, and in this case, you need to return an empty list.
+5. Your job is to implement the following functions:
+
+The constructor function:
+`AutocompleteSystem(String[] sentences, int[] times)`: This is the constructor. The input is historical data. 
+`sentences` is a string array consists of previously typed sentences. `times` is the corresponding times a sentence has been typed. 
+Your system should record these historical data.
+
+`List<String> input(char c)`: The input c is the next character typed by the user. 
+The character will only be lower-case letters ('a' to 'z'), blank space (' '), or a special character ('#'). 
+Also, the previously typed sentence should be recorded in your system. 
+The output will be the top 3 historical hot sentences that have prefix the same as the part of sentence already typed.
+
+Example:
+Operation: AutocompleteSystem(["i love you", "island", "ironman", "i love leetcode"], [5, 3, 2, 2])
+The system have these sentences with the following times:
+"i love you" : 5 times
+"island" : 3 times
+"ironman" : 2 times
+"i love leetcode" : 2 times
+
+Now, the user begins another search:
+
+Operation: input('i')
+Output: ["i love you", "island", "i love leetcode"]
+Explanation:
+There are four sentences that have prefix "i". Among them, "ironman" and "i love leetcode" have same hot degree. 
+Since ' ' has ASCII code 32 and 'r' has ASCII code 114, "i love leetcode" should be in front of "ironman". 
+Also we only need to output top 3 hot sentences, so "ironman" will be ignored.
+
+Operation: input(' ')
+Output: ["i love you", "i love leetcode"]
+Explanation:
+There are only two sentences that have prefix "i ".
+
+Operation: input('a')
+Output: []
+Explanation:
+There are no sentences that have prefix "i a".
+
+Operation: input('#')
+Output: []
+Explanation:
+The user finished the input, the sentence "i a" should be saved as a historical sentence in system. 
+And the following input will be counted as a new search.
+
+Constraints:
+- The string sentences[i] consists of lowercase English letters and spaces.
+- 1 <= sentences.length <= 100
+- 1 <= sentences[i].length <= 100
+- 1 <= times[i] <= 50
+- c is a lowercase English letter, a space ' ', or '#'.
+- At most 5000 calls will be made to input.
+
+APPROACH: Trie with Cached Hot List (or On-the-fly Search)
+----------------------------------------------------------
+Since we need prefix matches, a **Trie** is the standard choice.
+
+Data Structures:
+1. **TrieNode**: 
+   - `children`: Dict[char, TrieNode]
+   - `sentences`: Dictionary `{sentence: count}` for ALL sentences that pass through this node (i.e., this node is a prefix of them).
+
+Algorithm:
+1. **Initialization**: Build the Trie. For each sentence, traverse the Trie. At *every* node along the path, update the `sentences` dictionary with the sentence's count.
+   (Why store at every node? So that when we are at that node during input, we have immediate access to all valid sentences and their counts to sort them).
+   
+2. **Input(c)**:
+   - If `#`: This marks the end of a sentence.
+     - Update the Trie with the new full sentence.
+     - Increment its count in the `sentences` map of every node along its path.
+     - Reset current tracking.
+     - Return empty list.
+   - If char:
+     - Move to child node.
+     - If no child exists, current prefix has no matches. Return [].
+     - If child exists, retrieve all sentences from `child.sentences`.
+     - **Sort** the sentences:
+       - Primary Key: Frequency (Descending) -> Use `-freq`.
+       - Secondary Key: ASCII string order (Ascending) -> Use `sentence`.
+     - Return Top 3.
+
+Optimization Note:
+- Storing the full dictionary of sentences at every node consumes memory. 
+- A more optimized "System Design" approach would be to store only the *Top 3* at each node.
+- However, given the constraints (N=100 sentences, length=100), storing the full map is feasible and easier to implement correctly in an interview context.
+"""
+
+from typing import List
+from collections import defaultdict
+
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.sentences = defaultdict(int) # Maps sentence -> freq for all sentences in this subtree
+
+class AutocompleteSystem:
+    def __init__(self, sentences: List[str], times: List[int]):
+        self.root = TrieNode()
+        self.cur_node = self.root
+        self.cur_sentence = []
+        
+        # Build initial Trie
+        for s, t in zip(sentences, times):
+            self._add_to_trie(s, t)
+
+    def _add_to_trie(self, sentence, count):
+        # Determine the delta to add? No, we need absolute count or additive?
+        # The constructor provides initial counts.
+        # But for new inputs, we increment count.
+        # My approach: TrieNode stores {sentence: count}.
+        
+        node = self.root
+        # We also need to update the counts in the nodes.
+        # But wait, if I store *all* sentences in every node on the path, it consumes memory.
+        # Given constraints (100 sentences), this is fine.
+        
+        for char in sentence:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+            node.sentences[sentence] += count # Add count? 
+            # Wait, constructor sets initial value. input('#') increments.
+            # So _add_to_trie should likely take "count to add" or "absolute count"?
+            # Simplest: The dictionary tracks the current count.
+        
+        # NOTE: logic error in simple accumulation.
+        # If I call _add_to_trie("abc", 5), then later _add_to_trie("abc", 1), 
+        # the node for 'a' will have "abc": 6. Correct.
+        pass
+
+    def input(self, c: str) -> List[str]:
+        if c == '#':
+            # End of sentence
+            sentence = "".join(self.cur_sentence)
+            # Add to Trie (increment count by 1)
+            self._update_trie(sentence, 1)
+            
+            # Reset
+            self.cur_sentence = []
+            self.cur_node = self.root
+            return []
+        
+        # Process character
+        self.cur_sentence.append(c)
+        if not self.cur_node:
+            # We have deviated from known paths
+            return []
+            
+        if c not in self.cur_node.children:
+            self.cur_node = None # No path
+            return []
+            
+        self.cur_node = self.cur_node.children[c]
+        
+        # Get statistics from current node
+        # self.cur_node.sentences contains all sentences passing through here with their counts.
+        # We need to sort them.
+        # Criteria: -count (desc), then sentence (asc)
+        
+        candidates = []
+        for s, freq in self.cur_node.sentences.items():
+            # [PITFALL] Sorting Criteria.
+            # 1. Hot degree (descending). Use -freq.
+            # 2. ASCII order (ascending). Use s.
+            # Tuple comparison (-freq, s) handles this naturally.
+            candidates.append((-freq, s))
+            
+        candidates.sort()
+        
+        # Return top 3
+        return [s for freq, s in candidates[:3]]
+
+    def _update_trie(self, sentence, count):
+        node = self.root
+        for char in sentence:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+            node.sentences[sentence] += count
+
+# Test Cases
+if __name__ == "__main__":
+    sentences = ["i love you", "island", "ironman", "i love leetcode"]
+    times = [5, 3, 2, 2]
+    system = AutocompleteSystem(sentences, times)
+    
+    # Operation: input('i')
+    # Expected: ["i love you", "island", "i love leetcode"]
+    print(f"Input 'i': {system.input('i')}")
+    
+    # Operation: input(' ')
+    # Expected: ["i love you", "i love leetcode"]
+    print(f"Input ' ': {system.input(' ')}")
+    
+    # Operation: input('a')
+    # Expected: []
+    print(f"Input 'a': {system.input('a')}")
+    
+    # Operation: input('#')
+    # Expected: [] (updates history)
+    print(f"Input '#': {system.input('#')}")
+    
+    # Now "i a" has count 1.
+</code></pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script>
+        function openTab(evt, tabId) {
+            let parent = evt.target.closest('.problem-block');
+            let contents = parent.querySelectorAll('.tab-content');
+            contents.forEach(c => c.style.display = 'none');
+            let btns = parent.querySelectorAll('.tab-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).style.display = 'block';
+            evt.target.classList.add('active');
+        }
+        
+        function activateLink(el) {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            el.classList.add('active');
+        }
+        
+        function filterNav() {
+            let input = document.querySelector('.search-input').value.toLowerCase();
+            let links = document.querySelectorAll('.nav-link');
+            
+            links.forEach(link => {
+                let text = link.innerText.toLowerCase();
+                if (text.includes(input)) {
+                    link.style.display = "";
+                } else {
+                    link.style.display = "none";
+                }
+            });
+        }
+        
+        function toggleCategory(id) {
+            let el = document.getElementById('cat-' + id);
+            if (el.style.display === 'none') {
+                el.style.display = 'block';
+            } else {
+                el.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+    
